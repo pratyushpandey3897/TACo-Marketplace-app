@@ -1,6 +1,7 @@
 import { ThresholdMessageKit } from '@nucypher/taco';
 import React, { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Buffer } from 'buffer';
 
 interface Props {
   enabled: boolean;

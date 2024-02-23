@@ -10,6 +10,7 @@ import {
   import { Mumbai, useEthers } from '@usedapp/core';
   import { ethers } from 'ethers';
   import React, { useEffect, useState } from 'react';
+
   
   import { ConditionBuilder } from './ConditionBuilder';
 //   import { Decrypt } from './Decrypt';
@@ -99,12 +100,10 @@ import {
     return (
       <div>
         <div>
-          <h2>Web3 Provider</h2>
+          <h2>Publish Asset</h2>
           <button onClick={deactivate}> Disconnect Wallet</button>
           {account && <p>Account: {account}</p>}
         </div>
-  
-        <h2>Notice</h2>
   
         <h2>Ritual ID</h2>
         <p>Replace with your own ritual ID</p>
@@ -138,13 +137,6 @@ import {
           encrypt={encryptMessage}
           encryptedMessage={encryptedMessage!}
         />
-  
-        {/* <Decrypt
-          enabled={!!encryptedMessage}
-          decrypt={decryptMessage}
-          decryptedMessage={decryptedMessage}
-          decryptionErrors={decryptionErrors}
-        /> */}
       </div>
     );
   }

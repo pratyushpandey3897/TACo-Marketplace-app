@@ -1,6 +1,6 @@
 import { conditions } from '@nucypher/taco';
 import { Mumbai, useEthers } from '@usedapp/core';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 
 interface Props {
@@ -38,49 +38,66 @@ const myFunctionAbi: conditions.base.contract.FunctionAbiProps = {
   type: 'function',
 };
 
-const ownsNFT = new conditions.base.contract.ContractCondition({
-  method: 'balanceOf',
-  parameters: [':userAddress'],
-  standardContractType: 'ERC721',
-  contractAddress: '0xD7F4569064eBa34756F72787F9D0A7f7ea4B61e7',
-  chain: 80001,
-  returnValueTest: {
-    comparator: '>=',
-    value: 2,
-  },
-});
-
-// const isAuditCertified = new conditions.base.contract.ContractCondition({
-//   method: 'isAppCertified',
-//   parameters: [':walletId', ':appId',':currentCodeHash'],
-//   contractAddress: '0x235dca3e0781ef47bdc30455d6d0141ef6f73e36',
-//   functionAbi: myFunctionAbi,
-//   chain: 80001,
-//   returnValueTest: {
-//     comparator: '==',
-//     value: true,
-//   },
-// });
-
 export const ConditionBuilder = ({
   condition,
   setConditions,
   enabled,
 }: Props) => {
   const { library } = useEthers();
+  type CustomConditionType = conditions.compound.CompoundCondition | null;
+  const [customCondition, setCustomCondition] = useState<CustomConditionType>(null);
 
-  const demoCondition = JSON.stringify((condition ?? ownsNFT).toObj());
-  const [conditionString, setConditionString] = useState(demoCondition);
+  const rpcCondition = new conditions.base.rpc.RpcCondition({
+    chain: Mumbai.chainId,
+    method: 'eth_getBalance',
+    parameters: [':userAddress'],
+    returnValueTest: {
+      comparator: '>',
+      value:  0,
+    },
+  });
+  
+  const [conditionString, setConditionString] = useState(JSON.stringify(rpcCondition.toObj()));
+  
+  
+
+  const [nftOwnership, setNftOwnership] = useState(false);
+  const [erc20Ownership, setErc20Ownership] = useState(false);
+  const [auditNeeded, setAuditNeeded] = useState(false);
+
+  const [nftContractAddress, setNftContractAddress] = useState('');
+  const [erc20ContractAddress, setErc20ContractAddress] = useState('');
+  const [erc20Threshold, setErc20Threshold] = useState('');
+ 
 
   if (!enabled || !library) {
     return <></>;
   }
 
-  const prettyPrint = (obj: object | string) => {
+  
+
+  const handleNftOwnershipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNftOwnership(e.target.checked);
+  };
+
+  const handleErc20OwnershipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErc20Ownership(e.target.checked);
+  };
+
+  const handleAuditNeededChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAuditNeeded(e.target.checked);
+  };
+
+  const prettyPrint = (obj: object | string): string => {
     if (typeof obj === 'string') {
-      obj = JSON.parse(obj);
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        // If parsing fails, return an empty string
+        return '';
+      }
     }
-    return JSON.stringify(obj, null, 2);
+    return JSON.stringify(obj, null,  2);
   };
 
   const makeInput = (
@@ -89,31 +106,132 @@ export const ConditionBuilder = ({
   ) => (
     <textarea
       rows={15}
+      readOnly
       onChange={(e: any) => onChange(e.target.value)}
       defaultValue={prettyPrint(defaultValue)}
     >
       {}
     </textarea>
   );
-
   const conditionJSONInput = makeInput(
-    setConditionString,
-    JSON.stringify(ownsNFT.toObj())
+    () => {}, // No need for an onChange handler since the textarea is read-only
+    customCondition ? JSON.stringify(customCondition.toObj(), null,   2) : ''
   );
 
-  const onCreateCondition = (e: any) => {
+  const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setConditions(
-      conditions.ConditionFactory.conditionFromProps(
-        JSON.parse(conditionString)
-      )
-    );
+    let conditionsArray = [];
+
+  // Check if NFT ownership is selected and add the condition
+  if (nftOwnership) {
+    const ownsNFT = new conditions.base.contract.ContractCondition({
+      method: 'balanceOf',
+      parameters: [':userAddress'],
+      standardContractType: 'ERC721',
+      contractAddress: nftContractAddress, // Use the state value for the contract address
+      chain:   80001,
+      returnValueTest: {
+        comparator: '>=',
+        value:   1,
+      },
+    });
+    conditionsArray.push(ownsNFT);
+  }
+
+  // Check if ERC20 token ownership is selected and add the condition
+  if (erc20Ownership) {
+    const ownsERC20 = new conditions.base.contract.ContractCondition({
+      method: 'balanceOf',
+      parameters: [':userAddress'],
+      standardContractType: 'ERC20',
+      contractAddress: erc20ContractAddress, // Use the state value for the contract address
+      chain:   80001,
+      returnValueTest: {
+        comparator: '>=',
+        value: parseInt(erc20Threshold,   10) * Math.pow(10,   18), // Convert the threshold to the correct unit
+      },
+    });
+    conditionsArray.push(ownsERC20);
+  }
+  if (auditNeeded){
+    const isCertified = new conditions.base.contract.ContractCondition({
+      method: 'isAppCertified',
+      parameters: [':walletid', ':codehash'],
+      contractAddress: '0xb90d6aac5d201608634c7c4f7ee411c059463123',
+      functionAbi: myFunctionAbi,
+      chain: 80001,
+      returnValueTest: {
+        comparator: '==',
+        value: true,
+      },
+    });
+    conditionsArray.push(isCertified);
+  }
+
+  const newCustomCondition = conditions.compound.CompoundCondition.and(conditionsArray);
+  setCustomCondition(newCustomCondition);
+  setConditions(newCustomCondition);
+
   };
 
   return (
     <>
-      <h2>Step 1 - Create A Conditioned Access Policy</h2>
-      <div>
+      <h2>Step  1 - Create A Conditioned Access Policy</h2>
+      <form onSubmit={onCreateCondition}>
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={nftOwnership}
+              onChange={handleNftOwnershipChange}
+            />
+            NFT Ownership
+          </label>
+          {nftOwnership && (
+            <input
+              type="text"
+              placeholder="NFT Contract Address"
+              value={nftContractAddress}
+              onChange={(e) => setNftContractAddress(e.target.value)}
+            />
+          )}
+        </div>
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={erc20Ownership}
+              onChange={handleErc20OwnershipChange}
+            />
+            ERC20 Token Ownership
+          </label>
+          {erc20Ownership && (
+            <>
+              <input
+                type="text"
+                placeholder="ERC20 Contract Address"
+                value={erc20ContractAddress}
+                onChange={(e) => setErc20ContractAddress(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="Token Threshold"
+                value={erc20Threshold}
+                onChange={(e) => setErc20Threshold(e.target.value)}
+              />
+            </>
+          )}
+        </div>
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={auditNeeded}
+              onChange={handleAuditNeededChange}
+            />
+            Audit Needed
+          </label>
+        </div>
         <div>
           <h3>Customize your Conditions</h3>
           <div>
@@ -121,8 +239,8 @@ export const ConditionBuilder = ({
             {conditionJSONInput}
           </div>
         </div>
-        <button onClick={onCreateCondition}>Create Conditions</button>
-      </div>
+        <button type="submit">Create Conditions</button>
+      </form>
     </>
   );
 };
