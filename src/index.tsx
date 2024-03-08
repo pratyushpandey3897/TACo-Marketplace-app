@@ -3,6 +3,7 @@ import React, { StrictMode } from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 
 import App from './App';
+import { BrowserRouter } from 'react-router-dom';
 
 const config: Config = {
   networks: [Mumbai],
@@ -13,8 +14,10 @@ if (rootElement) {
   ReactDOMClient.createRoot(rootElement).render(
     <StrictMode>
       <DAppProvider config={config}>
+      <BrowserRouter>
         <App />
-      </DAppProvider>
+    </BrowserRouter>      
+    </DAppProvider>
     </StrictMode>,
   );
 }

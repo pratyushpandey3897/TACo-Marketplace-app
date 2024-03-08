@@ -1,19 +1,47 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction, createContext, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import PublishFormPage from './pages/PublishAssetPage';
+import Header from './header/header.component';
+import Sidebar from './sidebar/sidebar.component';
+import { ToastContainer } from 'react-toastify';
+
+interface IAccountContext {
+  currentAccount: string|null;
+  setCurrentAccount: Dispatch<SetStateAction<string|null>> ;
+}
+
+export const AccountContext = createContext<IAccountContext>({
+  currentAccount: null,
+  setCurrentAccount: () => { },
+});
 
 
-const App: React.FC = () => {
+const App = () => {
+  const [currentAccount, setCurrentAccount] = useState<string|null>('');
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/publish" element={<PublishFormPage />} />
-        {/* Add other routes as needed */}
-      </Routes>
-    </Router>
-  );
-};
+    <div className="bg-gray-100">
+            <AccountContext.Provider
+                value={{ currentAccount, setCurrentAccount }}
+            >
+                                          <Header />
+
+                        <div className="flex h-90v">
+                            <div className="w-1/8 pt-2">
+                                <Sidebar />
+                            </div>
+                            <div className="w-7/8 pt-2 pl-2">
+                                    <Routes>
+                                        <Route path="/" element={<LandingPage />} />
+                                        <Route path="publish" element={<PublishFormPage />} />
+                                    </Routes>
+                            </div>
+                        </div>
+                    </AccountContext.Provider>
+        <ToastContainer />
+    </div>
+);
+}
 
 export default App;
