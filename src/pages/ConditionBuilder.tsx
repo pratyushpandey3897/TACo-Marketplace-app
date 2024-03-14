@@ -7,6 +7,7 @@ interface Props {
   condition?: conditions.condition.Condition | undefined;
   setConditions: (value: conditions.condition.Condition) => void;
   enabled: boolean;
+  onConditionJsonChange: (conditionJson: string) => void;
 }
 const myFunctionAbi: conditions.base.contract.FunctionAbiProps = {
   inputs: [
@@ -39,9 +40,11 @@ const myFunctionAbi: conditions.base.contract.FunctionAbiProps = {
 };
 
 export const ConditionBuilder = ({
+  onConditionJsonChange,
   condition,
   setConditions,
   enabled,
+
 }: Props) => {
   const { library } = useEthers();
   type CustomConditionType = conditions.compound.CompoundCondition | null;
@@ -171,7 +174,7 @@ export const ConditionBuilder = ({
   const newCustomCondition = conditions.compound.CompoundCondition.and(conditionsArray);
   setCustomCondition(newCustomCondition);
   setConditions(newCustomCondition);
-
+  onConditionJsonChange(JSON.stringify(newCustomCondition.toObj()));
   };
 
   return (
