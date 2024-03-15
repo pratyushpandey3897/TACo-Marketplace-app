@@ -5,6 +5,7 @@ import PublishFormPage from './pages/PublishAssetPage';
 import Header from './header/header.component';
 import Sidebar from './sidebar/sidebar.component';
 import { ToastContainer } from 'react-toastify';
+import DisplayPage from './pages/DisplayPage';
 
 interface IAccountContext {
   currentAccount: string|null;
@@ -35,6 +36,7 @@ const App = () => {
                                     <Routes>
                                         <Route path="/" element={<LandingPage />} />
                                         <Route path="publish" element={<PublishFormPage />} />
+                                        <Route path="display" element={<DisplayPage/>} />
                                     </Routes>
                             </div>
                         </div>
