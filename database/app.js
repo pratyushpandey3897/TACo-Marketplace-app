@@ -20,7 +20,20 @@ app.get('/api/dataItems', async (req, res) => {
     res.status(500).json({ message: "Error fetching data items", error: error });
   }
 });
-
+// route for finding a particular data by Id
+app.get('/api/dataItems/:id', async (req, res) => {
+  try {
+    const item = await DataItem.findById(req.params.id);
+    if (item) {
+      res.json(item);
+    } else {
+      res.status(404).json({ message: "Data item not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching data item:", error);
+    res.status(500).json({ message: "Error fetching data item", error: error });
+  }
+});
 // API route to add a new data item
 app.post('/api/addItem', async (req, res) => {
   console.log(req.body);
