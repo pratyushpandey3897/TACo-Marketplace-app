@@ -20,31 +20,30 @@ export const AccountContext = createContext<IAccountContext>({
 
 
 const App = () => {
-  const [currentAccount, setCurrentAccount] = useState<string|null>('');
+  const [currentAccount, setCurrentAccount] = useState<string | null>("");
 
   return (
     <div className="bg-gray-100">
-            <AccountContext.Provider
-                value={{ currentAccount, setCurrentAccount }}
-            >
-                                          <Header />
+      <AccountContext.Provider value={{ currentAccount, setCurrentAccount }}>
+        <Header />
 
-                        <div className="flex h-90v">
-                            <div className="w-1/8 pt-2">
-                                <Sidebar />
-                            </div>
-                            <div className="w-7/8 pt-2 pl-2">
-                                    <Routes>
-                                        <Route path="/" element={<LandingPage />} />
-                                        <Route path="publish" element={<PublishFormPage />} />
-                                        <Route path="/details/:id" element={<AssetDetailsPage />} /> {/* Ensure this route is defined */}
-                                    </Routes>
-                            </div>
-                        </div>
-                    </AccountContext.Provider>
-        <ToastContainer />
+        <div className="flex h-90v">
+          <div className="w-1/8 pt-2">
+            <Sidebar />
+          </div>
+          <div className="w-7/8 pt-2 pl-2">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="publish" element={<PublishFormPage />} />
+              <Route path="/details/:id" element={<AssetDetailsPage />} />{" "}
+              {/* Ensure this route is defined */}
+            </Routes>
+          </div>
+        </div>
+      </AccountContext.Provider>
+      <ToastContainer />
     </div>
-);
+  );
 }
 
 export default App;

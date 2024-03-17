@@ -1,24 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { useEthers,Mumbai } from '@usedapp/core';
-import { ethers } from 'ethers';
-import { ConditionBuilder } from './ConditionBuilder';
-import { Encrypt } from './Encrypt';
-import { initialize, encrypt, conditions, ThresholdMessageKit,domains } from '@nucypher/taco';
-import { DEFAULT_DOMAIN, DEFAULT_RITUAL_ID } from './config';
+import React, { useEffect, useState } from "react";
+import { useEthers, Mumbai } from "@usedapp/core";
+import { ethers } from "ethers";
+import { ConditionBuilder } from "./ConditionBuilder";
+import { Encrypt } from "./Encrypt";
+import {
+  initialize,
+  encrypt,
+  conditions,
+  ThresholdMessageKit,
+  domains,
+} from "@nucypher/taco";
+import { DEFAULT_DOMAIN, DEFAULT_RITUAL_ID } from "./config";
 
 export default function App() {
-  const { activateBrowserWallet, deactivate, account, switchNetwork } = useEthers();
-  const [conditionJson, setConditionJson] = useState('');
+  const { activateBrowserWallet, deactivate, account, switchNetwork } =
+    useEthers();
+  const [conditionJson, setConditionJson] = useState("");
   const [loading, setLoading] = useState(false);
   const [condition, setCondition] = useState<conditions.condition.Condition>();
-  const [encryptedMessage, setEncryptedMessage] = useState<ThresholdMessageKit>();
+  const [encryptedMessage, setEncryptedMessage] =
+    useState<ThresholdMessageKit>();
   const [ritualId, setRitualId] = useState<number>(DEFAULT_RITUAL_ID);
   const [domain, setDomain] = useState<string>(DEFAULT_DOMAIN);
 
   // Added state hooks for new input fields
-  const [dataName, setDataName] = useState('');
-  const [dataDescription, setDataDescription] = useState('');
-  const [sampleDataUrl, setSampleDataUrl] = useState('');
+  const [dataName, setDataName] = useState("");
+  const [dataDescription, setDataDescription] = useState("");
+  const [sampleDataUrl, setSampleDataUrl] = useState("");
 
   useEffect(() => {
     initialize();
@@ -42,7 +50,7 @@ export default function App() {
       message,
       condition,
       ritualId,
-      provider.getSigner(),
+      provider.getSigner()
     );
 
     setEncryptedMessage(encryptedMessage);
@@ -59,57 +67,64 @@ export default function App() {
   }
 
   return (
-    <div>
-      <div>
-        <h2>Publish Asset</h2>
-        <button onClick={deactivate}> Disconnect Wallet</button>
-        {account && <p>Account: {account}</p>}
-      </div>
-
-      {/* Existing inputs and components */}
-      <h2>Ritual ID</h2>
-      <p>Replace with your own ritual ID</p>
-      <input
-        type="number"
-        value={ritualId}
-        onChange={(e) => setRitualId(parseInt(e.target.value))}
-      />
-
-      <h2>TACo Domain</h2>
-      <p>Must match the domain of your ritual</p>
-      <select
-        defaultValue={domain}
-        onChange={(e) => setDomain(e.target.value)}
-      >
-        {Object.values(domains).map((domain) => (
-          <option value={domain} key={domain}>
-            {domain}
-          </option>
-        ))}
-      </select>
- {/* New input fields */}
- <h2>Data Name</h2>
-      <input
-        type="text"
-        value={dataName}
-        onChange={(e) => setDataName(e.target.value)}
-        placeholder="Enter data name"
-      />
-
-      <h2>Data Description</h2>
-      <textarea
-        value={dataDescription}
-        onChange={(e) => setDataDescription(e.target.value)}
-        placeholder="Describe your data"
-      />
-
-      <h2>Sample Data URL</h2>
-      <input
-        type="url"
-        value={sampleDataUrl}
-        onChange={(e) => setSampleDataUrl(e.target.value)}
-        placeholder="Enter sample data URL"
-      />
+    <div className="rounded-md h-full overflow-y-scroll">
+      <h1 className="font-light text-xl p-5 text-center">Publish Asset</h1>
+      <form className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
+        <label className="flex flex-col">
+          <h2>Ritual ID</h2>
+          <p>Replace with your own ritual ID</p>
+          <input
+            type="number"
+            value={ritualId}
+            onChange={(e) => setRitualId(parseInt(e.target.value))}
+            className="border p-2 rounded"
+          />
+        </label>
+        <label className="flex flex-col">
+          <h2>TACo Domain</h2>
+          <p>Must match the domain of your ritual</p>
+          <select
+            defaultValue={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            className="border p-2 rounded"
+          >
+            {Object.values(domains).map((domain) => (
+              <option value={domain} key={domain}>
+                {domain}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col">
+          <h2>Data Name</h2>
+          <input
+            type="text"
+            value={dataName}
+            onChange={(e) => setDataName(e.target.value)}
+            className="border p-2 rounded"
+            placeholder="Enter data name"
+          />
+        </label>
+        <label className="flex flex-col">
+          <h2>Data Description</h2>
+          <textarea
+            value={dataDescription}
+            onChange={(e) => setDataDescription(e.target.value)}
+            className="border p-2 rounded"
+            placeholder="Describe your data"
+          />
+        </label>
+        <label className="flex flex-col">
+          <h2>Sample Data URL</h2>
+          <input
+            type="url"
+            value={sampleDataUrl}
+            onChange={(e) => setSampleDataUrl(e.target.value)}
+            className="border p-2 rounded"
+            placeholder="Enter sample data URL"
+          />
+        </label>
+      </form>
 
       <ConditionBuilder
         enabled={true}
@@ -117,17 +132,17 @@ export default function App() {
         setConditions={setCondition}
         onConditionJsonChange={handleConditionJsonChange}
       />
-   {conditionJson && (
-  <Encrypt
-    enabled={!!conditionJson}
-    encrypt={encryptMessage}
-    encryptedMessage={encryptedMessage}
-    DataName={dataName}
-    Desc={dataDescription}
-    sampleData={sampleDataUrl}
-    Condition={conditionJson} // TypeScript now knows condition is defined here
-  />
-)}
+      {conditionJson && (
+        <Encrypt
+          enabled={!!conditionJson}
+          encrypt={encryptMessage}
+          encryptedMessage={encryptedMessage}
+          DataName={dataName}
+          Desc={dataDescription}
+          sampleData={sampleDataUrl}
+          Condition={conditionJson} // TypeScript now knows condition is defined here
+        />
+      )}
     </div>
   );
 }

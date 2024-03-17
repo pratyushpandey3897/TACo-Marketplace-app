@@ -1,7 +1,7 @@
 import { Config, DAppProvider, Mumbai } from '@usedapp/core';
 import React, { StrictMode } from 'react';
+import "./index.css";
 import * as ReactDOMClient from 'react-dom/client';
-
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 
