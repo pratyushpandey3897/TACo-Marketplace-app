@@ -6,6 +6,7 @@ import Header from './header/header.component';
 import Sidebar from './sidebar/sidebar.component';
 import AssetDetailsPage from './pages/AssetDetailsPage';
 import { ToastContainer } from 'react-toastify';
+import DisplayPage from './pages/DisplayPage';
 
 interface IAccountContext {
   currentAccount: string|null;

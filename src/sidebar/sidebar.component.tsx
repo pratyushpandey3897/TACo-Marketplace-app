@@ -7,6 +7,7 @@ const Sidebar = () => {
             <div className="flex flex-col justify-start text-left w-full ">
                 <SidebarItem to="/" text="Landing Page" />
                 <SidebarItem to="publish" text="Publish Form Page" />
+                <SidebarItem to="display" text="Display Page" />
             </div>
         </div>
     );
