@@ -12,8 +12,13 @@ interface Asset {
     _id: string;
     DataName: string;
     Desc: string;
+    ownerAddress: string;
+    EncryptedBytes: string;
+    sampleData: string;
+    Conditions: string;
+    __v: number;
     // Include other properties as needed
-   }
+}
 const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
  const { id } = useParams(); // Get the asset ID from the URL
  const [asset, setAsset] = useState<Asset | null>(null); // State to hold the asset details
@@ -27,11 +32,25 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
 
  useEffect(() => {
     // Fetch the asset details using the ID
-    // Replace 'yourApiUrl' with the actual URL of your API
-    fetch(`yourApiUrl/${id}`)
-      .then(response => response.json())
-      .then(data => setAsset(data))
-      .catch(error => console.error('Error fetching asset details:', error));
+    const mockAsset = {
+        "_id": "65f3f09aea9127151e84dc2c",
+        "DataName": "dasdasd",
+        "Desc": "asdasdas",
+        "ownerAddress": "owner's address here",
+        "EncryptedBytes": "VE1LaQABAACSk8QwtJ+gz/nVLela5ZXA9IpxhmAbzkvWDtewKdW7ctGVwdMtR/vF9bpR/y1XVjWZztinxGCs/mj8AShoJGZUiLDfzvN/NJdoZl+E1jlsXw8gOQNYjnzPmn35V+4G4r3gyuMkyzkLqAX2UzNPFMVG0aelxakskzyTgN+yUtAw9qp2Z3uPp2jL/DYEHMrxNrCXkRjCI97EHRlgi+A0+vEoKP/Z0g5jwaP9Pac9Uq7UsxEFuyR4kpLEMKpJbA0RVhJcnVqUWS21REip+hWz2FupKDdTqJelgKIEnrVUqH6tIJpSZPxueVACR9oCRnsiY29uZGl0aW9uIjp7ImNvbmRpdGlvblR5cGUiOiJjb21wb3VuZCIsIm9wZXJhbmRzIjpbeyJjaGFpbiI6ODAwMDEsImNvbmRpdGlvblR5cGUiOiJjb250cmFjdCIsImNvbnRyYWN0QWRkcmVzcyI6IjB4NDY2Q2I1Nzc3OTlDMzllRDZDMzM1MDkyMDVhMTEyRjRFNTE3MDEyNSIsIm1ldGhvZCI6ImJhbGFuY2VPZiIsInBhcmFtZXRlcnMiOlsiOnVzZXJBZGRyZXNzIl0sInJldHVyblZhbHVlVGVzdCI6eyJjb21wYXJhdG9yIjoiPj0iLCJ2YWx1ZSI6MX0sInN0YW5kYXJkQ29udHJhY3RUeXBlIjoiRVJDNzIxIn0seyJjaGFpbiI6ODAwMDEsImNvbmRpdGlvblR5cGUiOiJjb250cmFjdCIsImNvbnRyYWN0QWRkcmVzcyI6IjB4NDY2Q2I1Nzc3OTlDMzllRDZDMzM1MDkyMDVhMTEyRjRFNTE3MDEyNSIsIm1ldGhvZCI6ImJhbGFuY2VPZiIsInBhcmFtZXRlcnMiOlsiOnVzZXJBZGRyZXNzIl0sInJldHVyblZhbHVlVGVzdCI6eyJjb21wYXJhdG9yIjoiPj0iLCJ2YWx1ZSI6LTIwMDAwMDAwMDAwMDAwMDAwMDB9LCJzdGFuZGFyZENvbnRyYWN0VHlwZSI6IkVSQzIwIn1dLCJvcGVyYXRvciI6ImFuZCJ9LCJ2ZXJzaW9uIjoiMS4wLjAifcRBquYoSDXGCWBbeNJq8ApEIV6eVTuU+02XgZly7DQZz4A6fIk/rIGtzsMIy7zeCpXmOQA+Luv5jEEYPWWSmxWoZhw=",
+        "sampleData": "asdasdasd",
+        "Conditions": "{\"conditionType\":\"compound\",\"operator\":\"and\",\"operands\":[{\"conditionType\":\"contract\",\"chain\":80001,\"method\":\"balanceOf\",\"parameters\":[\":userAddress\"],\"returnValueTest\":{\"comparator\":\">=\",\"value\":1},\"contractAddress\":\"0x466Cb577799C39eD6C33509205a112F4E5170125\",\"standardContractType\":\"ERC721\"},{\"conditionType\":\"contract\",\"chain\":80001,\"method\":\"balanceOf\",\"parameters\":[\":userAddress\"],\"returnValueTest\":{\"comparator\":\">=\",\"value\":-2000000000000000000},\"contractAddress\":\"0x466Cb577799C39eD6C33509205a112F4E5170125\",\"standardContractType\":\"ERC20\"}]}",
+        "__v": 0
+     };
+    
+     // Set the mock asset data to the state
+     setAsset(mockAsset);
+
+    //  [todo]
+    // fetch(`yourApiUrl/${id}`)
+    //   .then(response => response.json())
+    //   .then(data => setAsset(data))
+    //   .catch(error => console.error('Error fetching asset details:', error));
  }, [id]); // Depend on the ID to refetch if it changes
 
 //  if (!asset) {
@@ -291,52 +310,107 @@ const handleSubmit = async (event: React.FormEvent) => {
     });
  };
 
+
+
  return (
-    <div>
-    <h1>Asset Details Page for ID: {id}</h1> {/* Add the title here */}
-    {/* <h2>{asset.DataName}</h2>
-    <p>{asset.Desc}</p> */}
-    {/* Display other asset details as needed */}
+   <div className="rounded-md h-full overflow-y-scroll">
+     <div className="flex justify-between items-center p-5">
+       <h1 className="font-light text-xl">
+         Asset Details Page for ID: {asset?._id}
+       </h1>
+     </div>
 
-    <form onSubmit={handleSubmit}>
-        <label>
-          App ID:
-          <input type="text" value={appId} onChange={(e) => setAppId(e.target.value)} />
-        </label>
-        <label>
-          Code Hash:
-          <input type="text" value={codeHash} onChange={(e) => setCodeHash(e.target.value)} />
-        </label>
-        <button type="submit">Get Audited</button>
-      </form>
+     <div className="bg-white p-5 rounded shadow-lg mx-auto lg:w-3/4">
+       {asset && (
+         <div>
+           <h2>{asset.DataName}</h2>
+           <p>{asset.Desc}</p>
+           <p>Owner Address: {asset.ownerAddress}</p>
+           {/* Display other asset details as needed */}
+         </div>
+       )}
+     </div>
 
+     <h2 className="text-xl p-5 text-center">Check Access</h2>
+     <form
+       className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
+       onSubmit={handleCheckSubmit}
+     >
+       {checkResults.appCertified ? (
+         <span className="bg-green-500 text-white font-bold py-2 rounded-full mx-auto">
+           Access Granted
+         </span>
+       ) : (
+         <span className="bg-red-500 text-white font-bold py-2 rounded-full mx-auto">
+           Access conditions not satisfied
+         </span>
+       )}
+       <label className="flex flex-col">
+         <h2>NFT Address</h2>
+         <input
+           type="text"
+           value={nftAddress}
+           onChange={(e) => setNftAddress(e.target.value)}
+           className="border p-2 rounded"
+         />
+       </label>
+       <label className="flex flex-col">
+         <h2>App ID</h2>
+         <input
+           type="text"
+           value={appId}
+           onChange={(e) => setAppId(e.target.value)}
+           className="border p-2 rounded"
+         />
+       </label>
+       <label className="flex flex-col">
+         <h2>Code Hash</h2>
+         <input
+           type="text"
+           value={codeHash}
+           onChange={(e) => setCodeHash(e.target.value)}
+           className="border p-2 rounded"
+         />
+       </label>
+       <button
+         type="submit"
+         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+       >
+         Validate Access Conditions
+       </button>
 
-    <h2>Check Conditions</h2>
-      <form onSubmit={handleCheckSubmit}>
-    <label>
-        NFT Address:
-        <input type="text" value={nftAddress} onChange={(e) => setNftAddress(e.target.value)} />
-    </label>
-    <label>
-        App ID:
-        <input type="text" value={appId} onChange={(e) => setAppId(e.target.value)} />
-    </label>
-    <label>
-        Code Hash:
-        <input type="text" value={codeHash} onChange={(e) => setCodeHash(e.target.value)} />
-    </label>
-    <button type="submit">Check Conditions</button>
-</form>
-
-<div >
-    {checkResults.appCertified ? (
-        <p>App is audited.</p>
-    ) : (
-        <p>Application needs audit.</p>
-    )}
-</div>
-      
-  </div>
+     </form>
+     <h2 className="text-xl p-5 text-center">Smart Contract Audit</h2>
+     <form
+       className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
+       onSubmit={handleSubmit}
+     >
+       <label className="flex flex-col">
+         <h2>App ID</h2>
+         <input
+           type="text"
+           value={appId}
+           onChange={(e) => setAppId(e.target.value)}
+           className="border p-2 rounded"
+         />
+       </label>
+       <label className="flex flex-col">
+         <h2>Code Hash</h2>
+         <input
+           type="text"
+           value={codeHash}
+           onChange={(e) => setCodeHash(e.target.value)}
+           className="border p-2 rounded"
+         />
+       </label>
+       <button
+         type="submit"
+         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+       >
+         Get Audited
+       </button>
+     </form>
+   </div>
  );
 };
 

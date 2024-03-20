@@ -260,14 +260,20 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
 
   return (
     <>
-      <h2>Step  1 - Create A Conditioned Access Policy</h2>
-      <form onSubmit={onCreateCondition}>
-        <div>
-          <label>
+      <h1 className="font-light text-xl p-5 text-center">
+        Step 1 - Create A Conditioned Access Policy
+      </h1>
+      <form
+        onSubmit={onCreateCondition}
+        className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
+      >
+        <div className="flex flex-col">
+          <label className="flex items-center">
             <input
               type="checkbox"
               checked={nftOwnership}
               onChange={handleNftOwnershipChange}
+              className="mr-2"
             />
             NFT Ownership
           </label>
@@ -277,15 +283,17 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
               placeholder="NFT Contract Address"
               value={nftContractAddress}
               onChange={(e) => setNftContractAddress(e.target.value)}
+              className="border p-2 rounded mt-2"
             />
           )}
         </div>
-        <div>
-          <label>
+        <div className="flex flex-col">
+          <label className="flex items-center">
             <input
               type="checkbox"
               checked={erc20Ownership}
               onChange={handleErc20OwnershipChange}
+              className="mr-2"
             />
             ERC20 Token Ownership
           </label>
@@ -296,34 +304,42 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
                 placeholder="ERC20 Contract Address"
                 value={erc20ContractAddress}
                 onChange={(e) => setErc20ContractAddress(e.target.value)}
+                className="border p-2 rounded mt-2"
               />
               <input
                 type="number"
                 placeholder="Token Threshold"
                 value={erc20Threshold}
                 onChange={(e) => setErc20Threshold(e.target.value)}
+                className="border p-2 rounded mt-2"
               />
             </>
           )}
         </div>
-        <div>
-          <label>
+        <div className="flex flex-col">
+          <label className="flex items-center">
             <input
               type="checkbox"
               checked={auditNeeded}
               onChange={handleAuditNeededChange}
+              className="mr-2"
             />
             Audit Needed
           </label>
         </div>
-        <div>
-          <h3>Customize your Conditions</h3>
-          <div>
-            <h3>Condition JSON</h3>
+        <div className="flex flex-col">
+          <h3 className="mb-2">Customize your Conditions</h3>
+          <div className="flex flex-col">
+            <h3 className="mb-2">Condition JSON</h3>
             {conditionJSONInput}
           </div>
         </div>
-        <button type="submit">Create Conditions</button>
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Create Conditions
+        </button>
       </form>
     </>
   );

@@ -15,8 +15,16 @@ interface Props {
   sampleData: string;
 }
 
-export const Encrypt = ({ encrypt, encryptedMessage, enabled, DataName, Desc, sampleData,Condition }: Props) => {
-  const [plaintext, setPlaintext] = useState('plaintext');
+export const Encrypt = ({
+  encrypt,
+  encryptedMessage,
+  enabled,
+  DataName,
+  Desc,
+  sampleData,
+  Condition,
+}: Props) => {
+  const [plaintext, setPlaintext] = useState("plaintext");
 
   const onClickEncrypt = () => {
     encrypt(plaintext);
@@ -29,7 +37,9 @@ export const Encrypt = ({ encrypt, encryptedMessage, enabled, DataName, Desc, sa
     }
 
     // Assuming the `encrypt` function updates `encryptedMessage` with the latest encryption result
-    const encodedCiphertext = Buffer.from(encryptedMessage.toBytes()).toString('base64');
+    const encodedCiphertext = Buffer.from(encryptedMessage.toBytes()).toString(
+      "base64"
+    );
 
     try {
       await saveDataItem({
@@ -38,12 +48,12 @@ export const Encrypt = ({ encrypt, encryptedMessage, enabled, DataName, Desc, sa
         owneraddress: "owner's address here", // You need to provide the logic to fetch this
         EncryptedBytes: encodedCiphertext,
         sampleData,
-        Condition// Adjust based on actual data or pass as prop if needed
+        Condition, // Adjust based on actual data or pass as prop if needed
       });
-      alert('Data item saved successfully!');
+      alert("Data item saved successfully!");
     } catch (error) {
-      console.error('Failed to save data item:', error);
-      alert('Error saving data item.');
+      console.error("Failed to save data item:", error);
+      alert("Error saving data item.");
     }
   };
 
@@ -52,7 +62,9 @@ export const Encrypt = ({ encrypt, encryptedMessage, enabled, DataName, Desc, sa
       return null;
     }
 
-    const encodedCiphertext = Buffer.from(encryptedMessage.toBytes()).toString('base64');
+    const encodedCiphertext = Buffer.from(encryptedMessage.toBytes()).toString(
+      "base64"
+    );
 
     return (
       <>
@@ -63,21 +75,39 @@ export const Encrypt = ({ encrypt, encryptedMessage, enabled, DataName, Desc, sa
             <button>Copy to clipboard</button>
           </CopyToClipboard>
         </div>
-        <button onClick={onClickPublish} disabled={!enabled}>Publish Data Item</button>
+        <button onClick={onClickPublish} disabled={!enabled}>
+          Publish Data Item
+        </button>
       </>
     );
   };
 
   return (
-    <div>
-      <h2>Step 2 - Set conditions and Encrypt a message</h2>
-      <input
-        type="string"
-        value={plaintext}
-        onChange={(e) => setPlaintext(e.currentTarget.value)}
-      />
-      <button onClick={onClickEncrypt} disabled={!enabled}>Encrypt</button>
-      {EncryptedMessageContent()}
-    </div>
+    <>
+      <h1 className="font-light text-xl p-5 text-center">
+        Step 2 - Set conditions and Encrypt a message
+      </h1>
+      <form className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
+        <label className="flex flex-col">
+          <h2>Enter Plaintext</h2>
+          <input
+            type="text"
+            value={plaintext}
+            onChange={(e) => setPlaintext(e.currentTarget.value)}
+            className="border p-2 rounded"
+            placeholder="Enter your plaintext message here"
+          />
+        </label>
+        <button
+          type="button" // Change the type to "button"
+          onClick={onClickEncrypt}
+          disabled={!enabled}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Encrypt
+        </button>
+        {EncryptedMessageContent()}
+      </form>
+    </>
   );
 };
