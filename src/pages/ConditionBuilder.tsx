@@ -121,75 +121,21 @@ export const ConditionBuilder = ({
     customCondition ? JSON.stringify(customCondition.toObj(), null,   2) : ''
   );
 
-//   const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     let conditionsArray = [];
-
-//   // Check if NFT ownership is selected and add the condition
-//   if (nftOwnership) {
-//     const ownsNFT = new conditions.base.contract.ContractCondition({
-//       method: 'balanceOf',
-//       parameters: [':userAddress'],
-//       standardContractType: 'ERC721',
-//       contractAddress: nftContractAddress, // Use the state value for the contract address
-//       chain:   80001,
-//       returnValueTest: {
-//         comparator: '>=',
-//         value:   1,
-//       },
-//     });
-//     conditionsArray.push(ownsNFT);
-//   }
-
-//   // Check if ERC20 token ownership is selected and add the condition
-//   if (erc20Ownership) {
-//     const ownsERC20 = new conditions.base.contract.ContractCondition({
-//       method: 'balanceOf',
-//       parameters: [':userAddress'],
-//       standardContractType: 'ERC20',
-//       contractAddress: erc20ContractAddress, // Use the state value for the contract address
-//       chain:   80001,
-//       returnValueTest: {
-//         comparator: '>=',
-//         value: parseInt(erc20Threshold,   10) * Math.pow(10,   18), // Convert the threshold to the correct unit
-//       },
-//     });
-//     conditionsArray.push(ownsERC20);
-//   }
-//   if (auditNeeded){
-//     const isCertified = new conditions.base.contract.ContractCondition({
-//       method: 'isAppCertified',
-//       parameters: [':walletid', ':codehash'],
-//       contractAddress: '0xb90d6aac5d201608634c7c4f7ee411c059463123',
-//       functionAbi: myFunctionAbi,
-//       chain: 80001,
-//       returnValueTest: {
-//         comparator: '==',
-//         value: true,
-//       },
-//     });
-//     conditionsArray.push(isCertified);
-//   }
-//   let newCustomCondition;
-// if(conditionsArray.length==1)
-// {
-//   newCustomCondition= conditionsArray[0];
-// }else {
-//    newCustomCondition = conditions.compound.CompoundCondition.and(conditionsArray);
-// }
-//   setCustomCondition(newCustomCondition);
-//   setConditions(newCustomCondition);
-//   onConditionJsonChange(JSON.stringify(newCustomCondition.toObj()));
-//   };
 const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   let conditionsArray = [];
-  let conditionDescriptions = []; // To store human-readable descriptions
+  let conditionJSON = {
+    Audit: false,
+    NFTAddress: "",
+    ERC20: {
+      contractAddress: "",
+      Threshold: ""
+    }
+  };// To store human-readable descriptions
 
   // Check if NFT ownership is selected and add the condition
   if (nftOwnership) {
-    const ownsNFTDescription = `NFT Ownership: Requires ownership of an NFT from contract ${nftContractAddress}.`;
-    conditionDescriptions.push(ownsNFTDescription);
+    conditionJSON.NFTAddress= nftContractAddress;
 
     const ownsNFT = new conditions.base.contract.ContractCondition({
       method: 'balanceOf',
@@ -207,8 +153,8 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
 
   // Check if ERC20 token ownership is selected and add the condition
   if (erc20Ownership) {
-    const ownsERC20Description = `ERC20 Token Ownership: Requires holding at least ${erc20Threshold} tokens from contract ${erc20ContractAddress}.`;
-    conditionDescriptions.push(ownsERC20Description);
+    conditionJSON.ERC20.Threshold =erc20Threshold;
+    conditionJSON.ERC20.contractAddress = erc20ContractAddress;
 
     const ownsERC20 = new conditions.base.contract.ContractCondition({
       method: 'balanceOf',
@@ -226,9 +172,7 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
 
   // Check if audit is needed and add the condition
   if (auditNeeded) {
-    const isCertifiedDescription = "Audit Requirement: The app must be certified.";
-    conditionDescriptions.push(isCertifiedDescription);
-
+    conditionJSON.Audit =true;
     const isCertified = new conditions.base.contract.ContractCondition({
       method: 'isAppCertified',
       parameters: [':walletid', ':codehash'],
@@ -251,7 +195,7 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
   }
   
   // Use JSON.stringify to convert array of descriptions to a string if you prefer
-  const humanReadableConditions = conditionDescriptions.join('; ');
+  const humanReadableConditions = JSON.stringify(conditionJSON)
 
   setCustomCondition(newCustomCondition);
   setConditions(newCustomCondition);
