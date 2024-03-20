@@ -41,7 +41,7 @@ export default function App() {
     }
     setLoading(true);
 
-    await switchNetwork(Mumbai.chainId);
+    await switchNetwork(Mumbai .chainId);
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const encryptedMessage = await encrypt(
