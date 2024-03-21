@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useEthers, Mumbai } from "@usedapp/core";
 import { ethers } from "ethers";
 import { ConditionBuilder } from "./ConditionBuilder";
 import { Encrypt } from "./Encrypt";
+import { toast } from 'react-toastify';
+import { AccountContext } from "../App";
 import {
   initialize,
   encrypt,
@@ -13,9 +15,10 @@ import {
 import { DEFAULT_DOMAIN, DEFAULT_RITUAL_ID } from "./config";
 
 export default function App() {
-  const { activateBrowserWallet, deactivate, account, switchNetwork } =
+  const { activateBrowserWallet, deactivate, switchNetwork } =
     useEthers();
-  const [conditionJson, setConditionJson] = useState("");
+  const {currentAccount} = useContext(AccountContext);
+    const [conditionJson, setConditionJson] = useState("");
   const [loading, setLoading] = useState(false);
   const [condition, setCondition] = useState<conditions.condition.Condition>();
   const [encryptedMessage, setEncryptedMessage] =
@@ -31,12 +34,33 @@ export default function App() {
   useEffect(() => {
     initialize();
     switchNetwork(Mumbai.chainId);
+    if (!currentAccount) {
+      if (currentAccount === null || currentAccount === "")
+                toast.error("Wallet not connected", {
+                    position: "top-center",
+                    autoClose: false,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+        console.error('Current account is not set.');
+        return;
+    }
   }, []);
   const handleConditionJsonChange = (newConditionJson: string) => {
     setConditionJson(newConditionJson);
   };
   const encryptMessage = async (message: string) => {
     if (!condition) {
+      toast.info("Conditions are needed", {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+    });
       return;
     }
     setLoading(true);
@@ -57,11 +81,14 @@ export default function App() {
     setLoading(false);
   };
 
-  if (!account) {
+  if (!currentAccount) {
     return (
+      // <div>
+      //   <h2>Web3 Provider</h2>
+      //   <button onClick={() => activateBrowserWallet()}>Connect Wallet</button>
+      // </div>
       <div>
-        <h2>Web3 Provider</h2>
-        <button onClick={() => activateBrowserWallet()}>Connect Wallet</button>
+        <h2>Wallet Connection is needed</h2>
       </div>
     );
   }

@@ -21,7 +21,7 @@ const DataItemSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  Conditions: { type: String, required: true }
+  Condition: { type: String, required: true }
 });
 
 const DataItem = mongoose.model('DataItem', DataItemSchema);

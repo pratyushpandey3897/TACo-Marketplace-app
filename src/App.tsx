@@ -7,6 +7,7 @@ import Sidebar from './sidebar/sidebar.component';
 import AssetDetailsPage from './pages/AssetDetailsPage';
 import { ToastContainer } from 'react-toastify';
 import DisplayPage from './pages/DisplayPage';
+import "react-toastify/dist/ReactToastify.css";
 
 interface IAccountContext {
   currentAccount: string|null;
@@ -19,12 +20,15 @@ export const AccountContext = createContext<IAccountContext>({
 });
 
 
+
 const App = () => {
-  const [currentAccount, setCurrentAccount] = useState<string | null>("");
+  const [currentAccount, setCurrentAccount] = useState<string | null>(null);
 
   return (
     <div className="bg-gray-100">
-      <AccountContext.Provider value={{ currentAccount, setCurrentAccount }}>
+       <AccountContext.Provider
+                value={{ currentAccount, setCurrentAccount }}
+            >
         <Header />
 
         <div className="flex h-90v">

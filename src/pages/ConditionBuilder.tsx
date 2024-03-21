@@ -272,18 +272,23 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
           </label>
         </div>
         <div className="flex flex-col">
-          <h3 className="mb-2">Customize your Conditions</h3>
           <div className="flex flex-col">
-            <h3 className="mb-2">Condition JSON</h3>
-            {conditionJSONInput}
+            <div className="flex justify-center items-center p-5">
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
+              >
+                Create Conditions
+              </button>
+            </div>
+            {conditionJSONInput && (
+              <>
+                <h3 className="mb-2 font-semibold text-lg">Condition JSON</h3>
+                {conditionJSONInput}
+              </>
+            )}
           </div>
         </div>
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Create Conditions
-        </button>
       </form>
     </>
   );

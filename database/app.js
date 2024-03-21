@@ -43,7 +43,7 @@ app.post('/api/addItem', async (req, res) => {
     owneraddress: req.body.owneraddress,
     EncryptedBytes: req.body.EncryptedBytes,
     sampleData: req.body.sampleData,
-    Conditions: req.body.Condition // Assuming Conditions is properly formatted JSON
+    Condition: req.body.Condition // Assuming Conditions is properly formatted JSON
   });
 
   try {
