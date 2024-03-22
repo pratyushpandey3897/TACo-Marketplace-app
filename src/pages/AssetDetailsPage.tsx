@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import Web3 from 'web3'; 
 import { AccountContext } from '../App';
 import { toast } from 'react-toastify';
+import jsonABI from '../artifacts/NFTABI.json'
 interface AssetDetailsPageProps {
  // Define any props if needed
 }
@@ -64,9 +65,9 @@ const handleCheckSubmit = async (event: React.FormEvent) => {
         return;
     }
 
-    const contractAddress = '0x88207839a5a23ded370274ff0f7f96c331c55737'; //audti contract
+    const contractAddressCertification = '0x88207839a5a23ded370274ff0f7f96c331c55737'; //audti contract
     // Replace 'yourContractABI' with the actual contract ABI
-    const contractABI = [
+    const contractABICertification = [
         {
             "inputs": [
                 {
@@ -164,18 +165,27 @@ const handleCheckSubmit = async (event: React.FormEvent) => {
     ]
     const web3 = new Web3(window.ethereum);
     // Create contract instance
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-    
+    const contract = new web3.eth.Contract(contractABICertification, contractAddressCertification);
+    var nftContract,hasNft;
+    if (currentAccount && nftAddress) {
+       nftContract= new web3.eth.Contract(jsonABI,nftAddress);
+           // const nftBalance = await web3.eth.getBalance(nftAddress);
+    const balance = await nftContract.methods.balanceOf(currentAccount).call();
+        
+    const numericBalance = Number(balance); // This ensures 'balance' is treated as a number
+     hasNft = numericBalance > 0;
+  }
+   
+
     // Check NFT balance
-    const nftBalance = await web3.eth.getBalance(nftAddress);
-    const hasNft = nftBalance > 0; // Assuming 1 NFT is represented by a non-zero balance
+ // If balance is m// Assuming 1 NFT is represented by a non-zero balance
 
     // Check app certification
     const appCertifiedPromise = contract.methods.isAppCertified(currentAccount, appId, codeHash).call();
     const appCertified = await appCertifiedPromise.then(result => Boolean(result));
-    console.log('App certified:', appCertified);
+    console.log('App certified:', appCertified,hasNft);
     // Update results
-    setCheckResults({ nftBalance: hasNft, appCertified });
+    setCheckResults({ nftBalance: hasNft?hasNft:false, appCertified });
 };
 
 
