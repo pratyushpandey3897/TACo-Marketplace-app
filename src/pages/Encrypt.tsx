@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Buffer } from 'buffer';
 import { saveDataItem } from '../Services/AddItem'; // Adjust the import path as necessary
 import { ThresholdMessageKit,conditions } from '@nucypher/taco';
+import { AccountContext } from "../App";
 
 interface Props {
   enabled: boolean;
@@ -25,7 +26,7 @@ export const Encrypt = ({
   Condition,
 }: Props) => {
   const [plaintext, setPlaintext] = useState("plaintext");
-
+  const {currentAccount} = useContext(AccountContext);
   const onClickEncrypt = () => {
     encrypt(plaintext);
   };
@@ -42,10 +43,13 @@ export const Encrypt = ({
     );
 
     try {
+      if (currentAccount === null || currentAccount === "") {
+        return;
+      }
       await saveDataItem({
         DataName,
         Desc,
-        owneraddress: "owner's address here", // You need to provide the logic to fetch this
+        owneraddress: currentAccount, // You need to provide the logic to fetch this
         EncryptedBytes: encodedCiphertext,
         sampleData,
         Condition, // Adjust based on actual data or pass as prop if needed

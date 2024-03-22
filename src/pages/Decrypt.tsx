@@ -1,20 +1,25 @@
 import { ThresholdMessageKit } from '@nucypher/taco';
 import React, { useState } from 'react';
+import { Buffer } from 'buffer';
 
 interface Props {
   enabled: boolean;
   decrypt: (encryptedMessage: ThresholdMessageKit) => void;
   decryptedMessage?: string | undefined;
   decryptionErrors: string[];
-}
+  encryptedMessage: string;
+  onEncryptedMessageChange: (newMessage: string) => void; // Add this line to define the new prop
+ }
 
 export const Decrypt = ({
   decrypt,
   decryptedMessage,
   decryptionErrors,
   enabled,
+  encryptedMessage,
+  onEncryptedMessageChange,
 }: Props) => {
-  const [encryptedMessage, setEncryptedMessage] = useState('');
+  // const [encryptedMessage, setEncryptedMessage] = useState('');
 
   if (!enabled) {
     return <></>;
@@ -61,14 +66,23 @@ export const Decrypt = ({
   };
 
   return (
-    <div>
-      <h2>Step 3 - Decrypt Encrypted Message</h2>
-      <input
-        value={encryptedMessage}
-        placeholder="Enter encrypted message"
-        onChange={(e) => setEncryptedMessage(e.currentTarget.value)}
-      />
-      <button onClick={onDecrypt}>Decrypt</button>
+    <div className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
+      <label className="flex flex-col">
+        <p>Enter the encrypted message to decrypt</p>
+        <input
+          type="text"
+          value={encryptedMessage}
+          placeholder="Enter encrypted message"
+          onChange={(e) => onEncryptedMessageChange(e.currentTarget.value)} // Use the passed function to handle the change
+          className="border p-2 rounded"
+        />
+      </label>
+      <button
+        onClick={onDecrypt}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Decrypt
+      </button>
       {DecryptedMessage()}
       {DecryptionErrors()}
     </div>

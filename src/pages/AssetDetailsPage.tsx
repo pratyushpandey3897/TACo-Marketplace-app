@@ -4,21 +4,32 @@ import { useParams } from 'react-router-dom';
 import Web3 from 'web3'; 
 import { AccountContext } from '../App';
 import { toast } from 'react-toastify';
+import { Decrypt } from './Decrypt';
+import { useEthers, Mumbai } from "@usedapp/core";
+import { ethers } from 'ethers';
+import { MoonLoader } from "react-spinners";
+import {
+  decrypt,
+  getPorterUri,
+  domains,
+  ThresholdMessageKit,
+} from '@nucypher/taco';
+import { DEFAULT_DOMAIN, DEFAULT_RITUAL_ID } from './config';
 import jsonABI from '../artifacts/NFTABI.json'
 interface AssetDetailsPageProps {
  // Define any props if needed
 }
 
 interface Asset {
-    _id: string;
-    DataName: string;
-    Desc: string;
-    ownerAddress: string;
-    EncryptedBytes: string;
-    sampleData: string;
-    Conditions: string;
-    __v: number;
-    // Include other properties as needed
+  _id: string;
+  DataName: string;
+  Desc: string;
+  owneraddress: string;
+  EncryptedBytes: string;
+  sampleData: string;
+  Conditions: string;
+  __v: number;
+  // Include other properties as needed
 }
 const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
  const { id } = useParams(); // Get the asset ID from the URL
@@ -28,39 +39,53 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
  const { currentAccount } = useContext(AccountContext);
  const [nftAddress, setNftAddress] = useState('');
  const [checkResults, setCheckResults] = useState({ nftBalance: false, appCertified: false });
+ const [decryptedMessage, setDecryptedMessage] = useState<string>();
+ const [decryptionErrors, setDecryptionErrors] = useState<string[]>([]);
+ const [encryptedMessage, setEncryptedMessage] = useState<string>('');
+ const [loading, setLoading] = useState(false);
+ const [domain, setDomain] = useState<string>(DEFAULT_DOMAIN);
+ const { activateBrowserWallet, deactivate, switchNetwork } =
+    useEthers();
  
-
+ const onEncryptedMessageChange = (newMessage: string) => {
+  setEncryptedMessage(newMessage);
+};
 
  useEffect(() => {
-    // Fetch the asset details using the ID
-    const mockAsset = {
-        "_id": "65f3f09aea9127151e84dc2c",
-        "DataName": "dasdasd",
-        "Desc": "asdasdas",
-        "ownerAddress": "owner's address here",
-        "EncryptedBytes": "VE1LaQABAACSk8QwtJ+gz/nVLela5ZXA9IpxhmAbzkvWDtewKdW7ctGVwdMtR/vF9bpR/y1XVjWZztinxGCs/mj8AShoJGZUiLDfzvN/NJdoZl+E1jlsXw8gOQNYjnzPmn35V+4G4r3gyuMkyzkLqAX2UzNPFMVG0aelxakskzyTgN+yUtAw9qp2Z3uPp2jL/DYEHMrxNrCXkRjCI97EHRlgi+A0+vEoKP/Z0g5jwaP9Pac9Uq7UsxEFuyR4kpLEMKpJbA0RVhJcnVqUWS21REip+hWz2FupKDdTqJelgKIEnrVUqH6tIJpSZPxueVACR9oCRnsiY29uZGl0aW9uIjp7ImNvbmRpdGlvblR5cGUiOiJjb21wb3VuZCIsIm9wZXJhbmRzIjpbeyJjaGFpbiI6ODAwMDEsImNvbmRpdGlvblR5cGUiOiJjb250cmFjdCIsImNvbnRyYWN0QWRkcmVzcyI6IjB4NDY2Q2I1Nzc3OTlDMzllRDZDMzM1MDkyMDVhMTEyRjRFNTE3MDEyNSIsIm1ldGhvZCI6ImJhbGFuY2VPZiIsInBhcmFtZXRlcnMiOlsiOnVzZXJBZGRyZXNzIl0sInJldHVyblZhbHVlVGVzdCI6eyJjb21wYXJhdG9yIjoiPj0iLCJ2YWx1ZSI6MX0sInN0YW5kYXJkQ29udHJhY3RUeXBlIjoiRVJDNzIxIn0seyJjaGFpbiI6ODAwMDEsImNvbmRpdGlvblR5cGUiOiJjb250cmFjdCIsImNvbnRyYWN0QWRkcmVzcyI6IjB4NDY2Q2I1Nzc3OTlDMzllRDZDMzM1MDkyMDVhMTEyRjRFNTE3MDEyNSIsIm1ldGhvZCI6ImJhbGFuY2VPZiIsInBhcmFtZXRlcnMiOlsiOnVzZXJBZGRyZXNzIl0sInJldHVyblZhbHVlVGVzdCI6eyJjb21wYXJhdG9yIjoiPj0iLCJ2YWx1ZSI6LTIwMDAwMDAwMDAwMDAwMDAwMDB9LCJzdGFuZGFyZENvbnRyYWN0VHlwZSI6IkVSQzIwIn1dLCJvcGVyYXRvciI6ImFuZCJ9LCJ2ZXJzaW9uIjoiMS4wLjAifcRBquYoSDXGCWBbeNJq8ApEIV6eVTuU+02XgZly7DQZz4A6fIk/rIGtzsMIy7zeCpXmOQA+Luv5jEEYPWWSmxWoZhw=",
-        "sampleData": "asdasdasd",
-        "Conditions": "{\"conditionType\":\"compound\",\"operator\":\"and\",\"operands\":[{\"conditionType\":\"contract\",\"chain\":80001,\"method\":\"balanceOf\",\"parameters\":[\":userAddress\"],\"returnValueTest\":{\"comparator\":\">=\",\"value\":1},\"contractAddress\":\"0x466Cb577799C39eD6C33509205a112F4E5170125\",\"standardContractType\":\"ERC721\"},{\"conditionType\":\"contract\",\"chain\":80001,\"method\":\"balanceOf\",\"parameters\":[\":userAddress\"],\"returnValueTest\":{\"comparator\":\">=\",\"value\":-2000000000000000000},\"contractAddress\":\"0x466Cb577799C39eD6C33509205a112F4E5170125\",\"standardContractType\":\"ERC20\"}]}",
-        "__v": 0
-     };
-    
-     // Set the mock asset data to the state
-     setAsset(mockAsset);
-
-    //  [todo]
-    // fetch(`yourApiUrl/${id}`)
-    //   .then(response => response.json())
-    //   .then(data => setAsset(data))
-    //   .catch(error => console.error('Error fetching asset details:', error));
+  // initialize();
+  //   switchNetwork(Mumbai.chainId);
+  // Fetch the asset details using the ID
+  fetch(`http://localhost:5001/api/dataItems/${id}`)
+     .then(response => response.json())
+     .then(data => {
+       setAsset(data); // Assuming 'setAsset' is the state update function for 'asset'
+       if (data && data.EncryptedBytes) {
+         setEncryptedMessage(data.EncryptedBytes);
+         console.log('Encrypted message set:', data.EncryptedBytes); 
+       }
+     })
+     .catch(error => {
+       console.error('Error fetching asset details:', error);
+     });
  }, [id]); // Depend on the ID to refetch if it changes
 
 //  if (!asset) {
 //     return <div>Loading...</div>; // Or a loading spinner
 //  }
 
+
 const handleCheckSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!currentAccount) {
+      if (currentAccount === null || currentAccount === "")
+                toast.error("Wallet not connected", {
+                    position: "top-center",
+                    autoClose: false,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
         console.error('Current account is not set.');
         return;
     }
@@ -194,6 +219,14 @@ const handleSubmit = async (event: React.FormEvent) => {
     // Assuming you have a way to get the connected wallet address
     // const walletAddress = '0xYourConnectedWalletAddress';
     if (!currentAccount) {
+      toast.error("Wallet not connected", {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+    });
         console.error('Current account is not set.');
         return; // Exit the function if currentAccount is null
     }
@@ -306,21 +339,36 @@ const handleSubmit = async (event: React.FormEvent) => {
 
     const result = await contract.methods.registerApp(currentAccount, appId, codeHash).send({ from: currentAccount });
     console.log(result);
-    toast.success(`Access granted for App ID: ${appId}`, {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        style: {
-            width: 'auto', // Adjust the width as needed
-            maxWidth: '10%', // Set a maximum width to prevent it from covering the entire screen
-        },
-    });
+    toast.success("Audit Process Done", {
+      position: "top-center",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+  });
  };
 
+ const decryptMessage = async (encryptedMessage: ThresholdMessageKit) => {
+  // if (!condition) {
+  //   return;
+  // }
+  setLoading(true);
+  setDecryptedMessage('');
+  setDecryptionErrors([]);
 
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const decryptedMessage = await decrypt(
+    provider,
+    domain,
+    encryptedMessage,
+    getPorterUri(domain),
+    provider.getSigner(),
+  );
+
+  setDecryptedMessage(new TextDecoder().decode(decryptedMessage));
+  setLoading(false);
+};
 
  return (
    <div className="rounded-md h-full overflow-y-scroll">
@@ -335,7 +383,7 @@ const handleSubmit = async (event: React.FormEvent) => {
          <div>
            <h2>{asset.DataName}</h2>
            <p>{asset.Desc}</p>
-           <p>Owner Address: {asset.ownerAddress}</p>
+           <p>Owner Address: {asset.owneraddress}</p>
            {/* Display other asset details as needed */}
          </div>
        )}
@@ -346,7 +394,7 @@ const handleSubmit = async (event: React.FormEvent) => {
        className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
        onSubmit={handleCheckSubmit}
      >
-       {checkResults.appCertified ? (
+       {checkResults.appCertified && checkResults.nftBalance? (
          <span className="bg-green-500 text-white font-bold py-2 rounded-full mx-auto">
            Access Granted
          </span>
@@ -388,7 +436,6 @@ const handleSubmit = async (event: React.FormEvent) => {
        >
          Validate Access Conditions
        </button>
-
      </form>
      <h2 className="text-xl p-5 text-center">Smart Contract Audit</h2>
      <form
@@ -420,6 +467,32 @@ const handleSubmit = async (event: React.FormEvent) => {
          Get Audited
        </button>
      </form>
+     <h2 className="text-xl p-5 text-center">Decrypt</h2>
+     <div className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
+       <label className="flex flex-col">
+         <h2>TACo Domain</h2>
+         <p>Must match the domain of your ritual</p>
+         <select
+           defaultValue={domain}
+           onChange={(e) => setDomain(e.target.value)}
+           className="border p-2 rounded"
+         >
+           {Object.values(domains).map((domain) => (
+             <option value={domain} key={domain}>
+               {domain}
+             </option>
+           ))}
+         </select>
+       </label>
+     </div>
+     <Decrypt
+       enabled={!!encryptedMessage}
+       decrypt={decryptMessage}
+       decryptedMessage={decryptedMessage}
+       decryptionErrors={decryptionErrors}
+       encryptedMessage={encryptedMessage}
+       onEncryptedMessageChange={onEncryptedMessageChange} // Pass the function to update the encryptedMessage state
+     />
    </div>
  );
 };
