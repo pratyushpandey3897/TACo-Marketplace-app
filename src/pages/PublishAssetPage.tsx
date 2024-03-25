@@ -38,7 +38,7 @@ export default function App() {
       if (currentAccount === null || currentAccount === "")
                 toast.error("Wallet not connected", {
                     position: "top-center",
-                    autoClose: false,
+                    autoClose: 4000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
@@ -55,7 +55,7 @@ export default function App() {
     if (!condition) {
       toast.info("Conditions are needed", {
         position: "top-center",
-        autoClose: false,
+        autoClose: 4000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -65,7 +65,7 @@ export default function App() {
     }
     setLoading(true);
 
-    await switchNetwork(Mumbai .chainId);
+    await switchNetwork(Mumbai.chainId);
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const encryptedMessage = await encrypt(

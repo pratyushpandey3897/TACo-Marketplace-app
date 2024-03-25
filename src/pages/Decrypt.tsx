@@ -8,11 +8,13 @@ interface Props {
   decryptedMessage?: string | undefined;
   decryptionErrors: string[];
   encryptedMessage: string;
+  audit: boolean;
   onEncryptedMessageChange: (newMessage: string) => void; // Add this line to define the new prop
  }
 
 export const Decrypt = ({
   decrypt,
+  audit,
   decryptedMessage,
   decryptionErrors,
   enabled,
@@ -77,6 +79,28 @@ export const Decrypt = ({
           className="border p-2 rounded"
         />
       </label>
+      {/* {audit && (
+        <>
+          <label className="flex flex-col">
+            <h2>App ID</h2>
+            <input
+              type="text"
+              value={appId}
+              onChange={(e) => setAppId(e.target.value)}
+              className="border p-2 rounded"
+            />
+          </label>
+          <label className="flex flex-col">
+            <h2>Code Hash</h2>
+            <input
+              type="text"
+              value={codeHash}
+              onChange={(e) => setCodeHash(e.target.value)}
+              className="border p-2 rounded"
+            />
+          </label>
+        </>
+      )} */}
       <button
         onClick={onDecrypt}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

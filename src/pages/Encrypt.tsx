@@ -4,6 +4,7 @@ import { Buffer } from 'buffer';
 import { saveDataItem } from '../Services/AddItem'; // Adjust the import path as necessary
 import { ThresholdMessageKit,conditions } from '@nucypher/taco';
 import { AccountContext } from "../App";
+import { toast } from 'react-toastify';
 
 interface Props {
   enabled: boolean;
@@ -54,10 +55,26 @@ export const Encrypt = ({
         sampleData,
         Condition, // Adjust based on actual data or pass as prop if needed
       });
-      alert("Data item saved successfully!");
+      console.log("Data item saved successfully!");
+      toast.success("Asset Published", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (error) {
       console.error("Failed to save data item:", error);
       alert("Error saving data item.");
+      toast.error("Error in Publishing the asset", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
@@ -71,18 +88,27 @@ export const Encrypt = ({
     );
 
     return (
-      <>
-        <div>
-          <h3>Encrypted Data URL</h3>
+      <form className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
+        <label className="flex flex-col">
+          <h2>Encrypted Data URL</h2>
           <pre className="ciphertext">{encodedCiphertext}</pre>
           <CopyToClipboard text={encodedCiphertext}>
-            <button>Copy to clipboard</button>
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Copy to clipboard
+            </button>
           </CopyToClipboard>
-        </div>
-        <button onClick={onClickPublish} disabled={!enabled}>
+        </label>
+        <button
+          onClick={onClickPublish}
+          disabled={!enabled}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
           Publish Data Item
         </button>
-      </>
+      </form>
     );
   };
 

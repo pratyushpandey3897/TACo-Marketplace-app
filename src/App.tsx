@@ -23,7 +23,7 @@ export const AccountContext = createContext<IAccountContext>({
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState<string | null>(null);
-
+  
   return (
     <div className="bg-gray-100">
        <AccountContext.Provider
