@@ -11,6 +11,7 @@ import { MoonLoader } from "react-spinners";
 import {
   initialize,
   decrypt,
+  conditions,
   getPorterUri,
   domains,
   ThresholdMessageKit,
@@ -245,6 +246,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
      }
      
      console.log("App certified:", appCertified, hasNft, "Valid Access:", validAccess);
+     
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -384,6 +386,13 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     });
   };
 
+  
+
+  const customParameters: Record<string, conditions.context.CustomContextParam> = {
+    ':walletId': "0xefA52820ae44d26edf941bD4114c64b86C99fB18" ,
+    ':appId':1,
+    ':currentCodeHash' : "0x66b1132a0173910b01ee3a15ef4e69583bbf2f7f1e4462c99efbe1b9ab5bf808",
+  };
   const decryptMessage = async (encryptedMessage: ThresholdMessageKit) => {
     // if (!condition) {
     //   return;
@@ -398,7 +407,8 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       domain,
       encryptedMessage,
       getPorterUri(domain),
-      provider.getSigner()
+      provider.getSigner(),
+      customParameters
     );
 
     setDecryptedMessage(new TextDecoder().decode(decryptedMessage));
@@ -423,11 +433,18 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
 
       <div className="bg-white p-5 rounded shadow-lg mx-auto lg:w-3/4">
         {asset && (
-          <div>
-            <h2>{asset.DataName}</h2>
-            <p>{asset.Desc}</p>
-            <p>Owner Address: {asset.owneraddress}</p>
-            {/* Display other asset details as needed */}
+          <div className="flex flex-col">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold">{asset.DataName}</h2>
+            </div>
+            <div className="mb-4">
+              <p>{asset.Desc}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">
+                Owner Address: {asset.owneraddress}
+              </p>
+            </div>
           </div>
         )}
       </div>

@@ -39,6 +39,106 @@ const myFunctionAbi: conditions.base.contract.FunctionAbiProps = {
   type: 'function',
 };
 
+//updated ABI
+
+const jsonArray = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "walletId",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "appId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "currentCodeHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isAppCertified",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "walletId",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "appId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "appCodeHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "registerApp",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "registry",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "applicationId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "codeHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bool",
+          "name": "isCertified",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "walletId",
+          "type": "address"
+        }
+      ],
+      "name": "revokeCertification",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  
+ ];
+
 export const ConditionBuilder = ({
   onConditionJsonChange,
   condition,
@@ -175,7 +275,7 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
     conditionJSON.Audit =true;
     const isCertified = new conditions.base.contract.ContractCondition({
       method: 'isAppCertified',
-      parameters: [':walletid', ':codehash'],
+      parameters: [':walletId', ':appId',':currentCodeHash'],
       contractAddress: '0xb90d6aac5d201608634c7c4f7ee411c059463123',
       functionAbi: myFunctionAbi,
       chain: 80001,
