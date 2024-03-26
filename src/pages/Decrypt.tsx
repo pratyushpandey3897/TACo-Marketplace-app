@@ -1,15 +1,16 @@
 import { ThresholdMessageKit } from '@nucypher/taco';
 import React, { useState } from 'react';
 import { Buffer } from 'buffer';
+import { toast } from 'react-toastify';
 
 interface Props {
   enabled: boolean;
-  decrypt: (encryptedMessage: ThresholdMessageKit) => void;
+  decrypt: (encryptedMessage: ThresholdMessageKit, walletId?: string, appId?: number, currentCodeHash?: string) => Promise<void>;
   decryptedMessage?: string | undefined;
   decryptionErrors: string[];
   encryptedMessage: string;
   audit: boolean;
-  onEncryptedMessageChange: (newMessage: string) => void; // Add this line to define the new prop
+  onEncryptedMessageChange: (newMessage: string) => void;
  }
 
 export const Decrypt = ({
@@ -22,7 +23,8 @@ export const Decrypt = ({
   onEncryptedMessageChange,
 }: Props) => {
   // const [encryptedMessage, setEncryptedMessage] = useState('');
-
+  const [appId, setAppId] = useState<string>("");
+  const [codeHash, setCodeHash] = useState<string>("");
   if (!enabled) {
     return <></>;
   }
@@ -31,9 +33,24 @@ export const Decrypt = ({
     if (!encryptedMessage) {
       return;
     }
-    const mkBytes = Buffer.from(encryptedMessage, 'base64');
+    const mkBytes = Buffer.from(encryptedMessage, "base64");
     const mk = ThresholdMessageKit.fromBytes(mkBytes);
-    decrypt(mk);
+    if (audit) {
+      if (!appId || !codeHash) {
+        console.log("App ID and Code Hash are required for audit mode");
+        toast.error("App ID and Code Hash are required for audit mode", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return;
+      }
+      decrypt(mk, appId, parseInt(appId), codeHash);
+      return;
+    } else decrypt(mk);
   };
 
   const DecryptedMessage = () => {
@@ -79,7 +96,7 @@ export const Decrypt = ({
           className="border p-2 rounded"
         />
       </label>
-      {/* {audit && (
+      {audit && (
         <>
           <label className="flex flex-col">
             <h2>App ID</h2>
@@ -100,7 +117,7 @@ export const Decrypt = ({
             />
           </label>
         </>
-      )} */}
+      )}
       <button
         onClick={onDecrypt}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

@@ -388,28 +388,50 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
 
   
 
-  const customParameters: Record<string, conditions.context.CustomContextParam> = {
-    ':walletId': "0xefA52820ae44d26edf941bD4114c64b86C99fB18" ,
-    ':appId':1,
-    ':currentCodeHash' : "0x66b1132a0173910b01ee3a15ef4e69583bbf2f7f1e4462c99efbe1b9ab5bf808",
-  };
-  const decryptMessage = async (encryptedMessage: ThresholdMessageKit) => {
+  
+  const decryptMessage = async (
+    encryptedMessage: ThresholdMessageKit,
+    walletId?: string,
+    appId?: number,
+    currentCodeHash?: string
+  ): Promise<void>  => {
     // if (!condition) {
     //   return;
     // }
     setLoading(true);
     setDecryptedMessage("");
     setDecryptionErrors([]);
-
+    
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const decryptedMessage = await decrypt(
-      provider,
-      domain,
-      encryptedMessage,
-      getPorterUri(domain),
-      provider.getSigner(),
-      customParameters
-    );
+    let customParameters:
+      | Record<string, conditions.context.CustomContextParam>
+      | undefined;
+    if (audit && walletId && appId !== undefined && currentCodeHash) {
+      customParameters = {
+        ":walletId": walletId,
+        ":appId": appId,
+        ":currentCodeHash": currentCodeHash,
+      };
+    }
+    let decryptedMessage: Uint8Array;
+    if (customParameters) {
+      decryptedMessage = await decrypt(
+        provider,
+        domain,
+        encryptedMessage,
+        getPorterUri(domain),
+        provider.getSigner(),
+        customParameters
+      );
+    } else {
+      decryptedMessage = await decrypt(
+        provider,
+        domain,
+        encryptedMessage,
+        getPorterUri(domain),
+        provider.getSigner()
+      );
+    }
 
     setDecryptedMessage(new TextDecoder().decode(decryptedMessage));
     setLoading(false);
@@ -445,6 +467,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
                 Owner Address: {asset.owneraddress}
               </p>
             </div>
+            
           </div>
         )}
       </div>
@@ -503,6 +526,9 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
           Validate Access Conditions
         </button>
       </form>
+      
+      {audit ? (
+    <>
       <h2 className="text-xl p-5 text-center">Smart Contract Audit</h2>
       <form
         className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
@@ -533,6 +559,10 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
           Get Audited
         </button>
       </form>
+    </>
+ ) : (
+    <h2 className="text-xl p-5 text-center">Audit Not Needed</h2>
+ )}
       <h2 className="text-xl p-5 text-center">Decrypt</h2>
       <div className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
         <label className="flex flex-col">
