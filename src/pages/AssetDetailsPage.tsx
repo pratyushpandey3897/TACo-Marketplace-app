@@ -108,103 +108,103 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     }
 
     const contractAddressCertification =
-      "0x88207839a5a23ded370274ff0f7f96c331c55737"; //audti contract
+      "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4"; //audti contract
     // Replace 'yourContractABI' with the actual contract ABI
     const contractABICertification = [
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "walletId",
-            type: "address",
+            "internalType": "address",
+            "name": "walletId",
+            "type": "address"
           },
           {
-            internalType: "uint256",
-            name: "appId",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "appId",
+            "type": "uint256"
           },
           {
-            internalType: "bytes32",
-            name: "appCodeHash",
-            type: "bytes32",
-          },
+            "internalType": "bytes32",
+            "name": "appCodeHash",
+            "type": "bytes32"
+          }
         ],
-        name: "registerApp",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
+        "name": "registerApp",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "walletId",
-            type: "address",
-          },
+            "internalType": "address",
+            "name": "walletId",
+            "type": "address"
+          }
         ],
-        name: "revokeCertification",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
+        "name": "revokeCertification",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "walletId",
-            type: "address",
+            "internalType": "address",
+            "name": "walletId",
+            "type": "address"
           },
           {
-            internalType: "uint256",
-            name: "appId",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "appId",
+            "type": "uint256"
           },
           {
-            internalType: "bytes32",
-            name: "currentCodeHash",
-            type: "bytes32",
-          },
+            "internalType": "bytes32",
+            "name": "currentCodeHash",
+            "type": "bytes32"
+          }
         ],
-        name: "isAppCertified",
-        outputs: [
+        "name": "isAppCertified",
+        "outputs": [
           {
-            internalType: "bool",
-            name: "",
-            type: "bool",
-          },
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
         ],
-        stateMutability: "view",
-        type: "function",
+        "stateMutability": "view",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "",
-            type: "address",
-          },
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
         ],
-        name: "registry",
-        outputs: [
+        "name": "registry",
+        "outputs": [
           {
-            internalType: "uint256",
-            name: "applicationId",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "applicationId",
+            "type": "uint256"
           },
           {
-            internalType: "bytes32",
-            name: "codeHash",
-            type: "bytes32",
+            "internalType": "bytes32",
+            "name": "codeHash",
+            "type": "bytes32"
           },
           {
-            internalType: "bool",
-            name: "isCertified",
-            type: "bool",
-          },
+            "internalType": "bool",
+            "name": "isCertified",
+            "type": "bool"
+          }
         ],
-        stateMutability: "view",
-        type: "function",
-      },
+        "stateMutability": "view",
+        "type": "function"
+      }
     ];
     const web3 = new Web3(window.ethereum);
     // Create contract instance
@@ -267,103 +267,103 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     }
 
     // Replace 'yourContractAddress' with the actual contract address
-    const contractAddress = "0x88207839a5a23ded370274ff0f7f96c331c55737";
+    const contractAddress = "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4";
     // Replace 'yourContractABI' with the actual contract ABI
     const contractABI = [
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "walletId",
-            type: "address",
+            "internalType": "address",
+            "name": "walletId",
+            "type": "address"
           },
           {
-            internalType: "uint256",
-            name: "appId",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "appId",
+            "type": "uint256"
           },
           {
-            internalType: "bytes32",
-            name: "appCodeHash",
-            type: "bytes32",
-          },
+            "internalType": "bytes32",
+            "name": "currentCodeHash",
+            "type": "bytes32"
+          }
         ],
-        name: "registerApp",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
+        "name": "isAppCertified",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "walletId",
-            type: "address",
+            "internalType": "address",
+            "name": "walletId",
+            "type": "address"
           },
+          {
+            "internalType": "uint256",
+            "name": "appId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "appCodeHash",
+            "type": "bytes32"
+          }
         ],
-        name: "revokeCertification",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
+        "name": "registerApp",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "walletId",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "appId",
-            type: "uint256",
-          },
-          {
-            internalType: "bytes32",
-            name: "currentCodeHash",
-            type: "bytes32",
-          },
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
         ],
-        name: "isAppCertified",
-        outputs: [
+        "name": "registry",
+        "outputs": [
           {
-            internalType: "bool",
-            name: "",
-            type: "bool",
+            "internalType": "uint256",
+            "name": "applicationId",
+            "type": "uint256"
           },
+          {
+            "internalType": "bytes32",
+            "name": "codeHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bool",
+            "name": "isCertified",
+            "type": "bool"
+          }
         ],
-        stateMutability: "view",
-        type: "function",
+        "stateMutability": "view",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: "address",
-            name: "",
-            type: "address",
-          },
+            "internalType": "address",
+            "name": "walletId",
+            "type": "address"
+          }
         ],
-        name: "registry",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "applicationId",
-            type: "uint256",
-          },
-          {
-            internalType: "bytes32",
-            name: "codeHash",
-            type: "bytes32",
-          },
-          {
-            internalType: "bool",
-            name: "isCertified",
-            type: "bool",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
+        "name": "revokeCertification",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
     ];
 
     // Initialize web3 or ethers instance
@@ -397,7 +397,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   ): Promise<void>  => {
     // if (!condition) {
     //   return;
-    // }
+    // }z
     setLoading(true);
     setDecryptedMessage("");
     setDecryptionErrors([]);
@@ -407,22 +407,24 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       | Record<string, conditions.context.CustomContextParam>
       | undefined;
     if (audit && walletId && appId !== undefined && currentCodeHash) {
+     
       customParameters = {
-        ":walletId": walletId,
+        ":walletId":"0x73684c62EBF97278967ebF2D1AB74DE32CE52f4e",
         ":appId": appId,
         ":currentCodeHash": currentCodeHash,
       };
+      console.log(customParameters)
     }
     let decryptedMessage: Uint8Array;
     if (customParameters) {
-      decryptedMessage = await decrypt(
-        provider,
-        domain,
-        encryptedMessage,
-        getPorterUri(domain),
-        provider.getSigner(),
-        customParameters
-      );
+        decryptedMessage = await decrypt(
+          provider,
+          domain,
+          encryptedMessage,
+          getPorterUri(domain),
+          provider.getSigner(),
+          customParameters
+        );
     } else {
       decryptedMessage = await decrypt(
         provider,

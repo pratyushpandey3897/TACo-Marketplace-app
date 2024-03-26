@@ -9,7 +9,10 @@ interface Props {
   enabled: boolean;
   onConditionJsonChange: (conditionJson: string) => void;
 }
-const myFunctionAbi: conditions.base.contract.FunctionAbiProps = {
+const isAppCertifiedAbi: conditions.base.contract.FunctionAbiProps = {
+  name: 'isAppCertified',
+  type: 'function',
+  stateMutability: 'view',
   inputs: [
     {
       internalType: 'address',
@@ -27,18 +30,14 @@ const myFunctionAbi: conditions.base.contract.FunctionAbiProps = {
       type: 'bytes32',
     },
   ],
-  name: 'isAppCertified',
   outputs: [
     {
       internalType: 'bool',
-      name: '',
+      name: 'someValue', // Assuming you wanted to rename the output here for consistency
       type: 'bool',
     },
   ],
-  stateMutability: 'view',
-  type: 'function',
 };
-
 //updated ABI
 
 const jsonArray = [
@@ -276,8 +275,8 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
     const isCertified = new conditions.base.contract.ContractCondition({
       method: 'isAppCertified',
       parameters: [':walletId', ':appId',':currentCodeHash'],
-      contractAddress: '0xb90d6aac5d201608634c7c4f7ee411c059463123',
-      functionAbi: myFunctionAbi,
+      contractAddress: '0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4',
+      functionAbi: isAppCertifiedAbi,
       chain: 80001,
       returnValueTest: {
         comparator: '==',
