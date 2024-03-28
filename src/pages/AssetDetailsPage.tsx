@@ -107,6 +107,14 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       return;
     }
 
+    toast.info("Checking Access Conditions", {
+      position: "top-center",
+      autoClose: 4000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
     const contractAddressCertification =
       "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4"; //audti contract
     // Replace 'yourContractABI' with the actual contract ABI
@@ -246,6 +254,14 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
      }
      
      console.log("App certified:", appCertified, hasNft, "Valid Access:", validAccess);
+     toast.success("Access Conditions Checked", {
+      position: "top-center",
+      autoClose: 4000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+     });
      
   };
 
@@ -265,6 +281,14 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       console.error("Current account is not set.");
       return; // Exit the function if currentAccount is null
     }
+    toast.info("Starting Audit Process", {
+      position: "top-center",
+      autoClose: 4000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
 
     // Replace 'yourContractAddress' with the actual contract address
     const contractAddress = "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4";
@@ -406,17 +430,32 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     let customParameters:
       | Record<string, conditions.context.CustomContextParam>
       | undefined;
-    if (audit && walletId && appId !== undefined && currentCodeHash) {
-     
-      customParameters = {
-        ":walletId":"0x73684c62EBF97278967ebF2D1AB74DE32CE52f4e",
-        ":appId": appId,
-        ":currentCodeHash": currentCodeHash,
-      };
-      console.log(customParameters)
-    }
+      if (currentAccount && audit && walletId && appId !== undefined && currentCodeHash) {
+        customParameters = {
+           ":walletId": currentAccount,
+           ":appId": appId,
+           ":currentCodeHash": currentCodeHash,
+        };
+        console.log(customParameters);
+       } else {
+        // Check for specific conditions and display toast errors accordingly
+        if (!currentAccount || currentAccount === "") {
+           toast.error("Current account is not set or is empty.", {
+             position: "top-center",
+             autoClose: 4000,
+             hideProgressBar: false,
+             closeOnClick: true,
+             pauseOnHover: true,
+             draggable: true,
+           });
+           
+        }
+        setLoading(false);
+        return;
+       }
     let decryptedMessage: Uint8Array;
-    if (customParameters) {
+    try {
+      if (customParameters) {
         decryptedMessage = await decrypt(
           provider,
           domain,
@@ -425,26 +464,40 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
           provider.getSigner(),
           customParameters
         );
-    } else {
-      decryptedMessage = await decrypt(
-        provider,
-        domain,
-        encryptedMessage,
-        getPorterUri(domain),
-        provider.getSigner()
-      );
-    }
+      } else {
+        decryptedMessage = await decrypt(
+          provider,
+          domain,
+          encryptedMessage,
+          getPorterUri(domain),
+          provider.getSigner()
+        );
+      }
 
-    setDecryptedMessage(new TextDecoder().decode(decryptedMessage));
-    setLoading(false);
-    toast.success("Message Decrypted", {
-      position: "top-center",
-      autoClose: 4000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
+      setDecryptedMessage(new TextDecoder().decode(decryptedMessage));
+      setLoading(false);
+      toast.success("Message Decrypted", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+     } catch (error) {
+      console.error("Decryption error:", error);
+      setLoading(false);
+      toast.error("Threshold of responses not met; TACo decryption failed with errors", {
+         position: "top-center",
+         autoClose: 4000,
+         hideProgressBar: false,
+         closeOnClick: true,
+         pauseOnHover: true,
+         draggable: true,
+      });
+     }
+
+    
   };
 
   return (
