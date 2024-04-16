@@ -227,8 +227,11 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
          .balanceOf(currentAccount)
          .call();
      
-      const numericBalance = Number(balance); // This ensures 'balance' is treated as a number
+      const numericBalance = Number(balance);
+      console.log("number",numericBalance);
+       // This ensures 'balance' is treated as a number
       hasNft = numericBalance > 0;
+      console.log(hasNft);
      }
      
      var appCertified
@@ -455,7 +458,9 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
        }
     let decryptedMessage: Uint8Array;
     try {
-      if (customParameters) {
+      console.log("reached here")
+      if (customParameters.appId) {
+        console.log("inside decrypt")
         decryptedMessage = await decrypt(
           provider,
           domain,
@@ -465,6 +470,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
           customParameters
         );
       } else {
+        console.log("entered")
         decryptedMessage = await decrypt(
           provider,
           domain,

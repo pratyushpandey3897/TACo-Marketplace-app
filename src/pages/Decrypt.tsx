@@ -30,11 +30,13 @@ export const Decrypt = ({
   }
 
   const onDecrypt = () => {
+    console.log("called decrypt")
     if (!encryptedMessage) {
       return;
     }
     const mkBytes = Buffer.from(encryptedMessage, "base64");
     const mk = ThresholdMessageKit.fromBytes(mkBytes);
+    console.log(mk)
     if (audit) {
       if (!appId || !codeHash) {
         console.log("App ID and Code Hash are required for audit mode");
