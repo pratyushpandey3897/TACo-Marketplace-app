@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const cors = require('cors');
+const crypto = require('crypto');
 require('./configs/database.config.js');
 const DataItem = require('./models/DataItem'); // Make sure the path is correct
 
@@ -45,7 +46,7 @@ app.post('/api/addItem', async (req, res) => {
     sampleData: req.body.sampleData,
     Condition: req.body.Condition // Assuming Conditions is properly formatted JSON
   });
-
+ 
   try {
     console.log(newItem);
     const savedItem = await newItem.save();
@@ -53,6 +54,14 @@ app.post('/api/addItem', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error saving the data item", error: error });
   }
+});
+app.post('/api/hash', (req, res) => {
+  const { inputString } = req.body;
+  if (!inputString) {
+      return res.status(400).send('Input string is required');
+  }
+  const hash = crypto.createHash('sha256').update(inputString).digest('hex');
+  res.send({ hash });
 });
 
 app.listen(port, () => {

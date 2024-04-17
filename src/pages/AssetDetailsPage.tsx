@@ -268,10 +268,155 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
      
   };
 
+  // const handleSubmit = async (event: React.FormEvent) => {
+  //   event.preventDefault();
+  //   // Assuming you have a way to get the connected wallet address
+  //   // const walletAddress = '0xYourConnectedWalletAddress';
+  //   if (!currentAccount) {
+  //     toast.error("Wallet not connected", {
+  //       position: "top-center",
+  //       autoClose: 4000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //     });
+  //     console.error("Current account is not set.");
+  //     return; // Exit the function if currentAccount is null
+  //   }
+  //   toast.info("Starting Audit Process", {
+  //     position: "top-center",
+  //     autoClose: 4000,
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: true,
+  //     draggable: true,
+  //   });
+
+  //   // Replace 'yourContractAddress' with the actual contract address
+  //   const contractAddress = "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4";
+  //   // Replace 'yourContractABI' with the actual contract ABI
+  //   const contractABI = [
+  //     {
+  //       "inputs": [
+  //         {
+  //           "internalType": "address",
+  //           "name": "walletId",
+  //           "type": "address"
+  //         },
+  //         {
+  //           "internalType": "uint256",
+  //           "name": "appId",
+  //           "type": "uint256"
+  //         },
+  //         {
+  //           "internalType": "bytes32",
+  //           "name": "currentCodeHash",
+  //           "type": "bytes32"
+  //         }
+  //       ],
+  //       "name": "isAppCertified",
+  //       "outputs": [
+  //         {
+  //           "internalType": "bool",
+  //           "name": "",
+  //           "type": "bool"
+  //         }
+  //       ],
+  //       "stateMutability": "view",
+  //       "type": "function"
+  //     },
+  //     {
+  //       "inputs": [
+  //         {
+  //           "internalType": "address",
+  //           "name": "walletId",
+  //           "type": "address"
+  //         },
+  //         {
+  //           "internalType": "uint256",
+  //           "name": "appId",
+  //           "type": "uint256"
+  //         },
+  //         {
+  //           "internalType": "bytes32",
+  //           "name": "appCodeHash",
+  //           "type": "bytes32"
+  //         }
+  //       ],
+  //       "name": "registerApp",
+  //       "outputs": [],
+  //       "stateMutability": "nonpayable",
+  //       "type": "function"
+  //     },
+  //     {
+  //       "inputs": [
+  //         {
+  //           "internalType": "address",
+  //           "name": "",
+  //           "type": "address"
+  //         }
+  //       ],
+  //       "name": "registry",
+  //       "outputs": [
+  //         {
+  //           "internalType": "uint256",
+  //           "name": "applicationId",
+  //           "type": "uint256"
+  //         },
+  //         {
+  //           "internalType": "bytes32",
+  //           "name": "codeHash",
+  //           "type": "bytes32"
+  //         },
+  //         {
+  //           "internalType": "bool",
+  //           "name": "isCertified",
+  //           "type": "bool"
+  //         }
+  //       ],
+  //       "stateMutability": "view",
+  //       "type": "function"
+  //     },
+  //     {
+  //       "inputs": [
+  //         {
+  //           "internalType": "address",
+  //           "name": "walletId",
+  //           "type": "address"
+  //         }
+  //       ],
+  //       "name": "revokeCertification",
+  //       "outputs": [],
+  //       "stateMutability": "nonpayable",
+  //       "type": "function"
+  //     }
+  //   ];
+
+  //   // Initialize web3 or ethers instance
+  //   const web3 = new Web3(window.ethereum); // If you're using Web3.js
+
+  //   // Create contract instance
+  //   const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+  //   const result = await contract.methods
+  //     .registerApp(currentAccount, appId, codeHash)
+  //     .send({ from: currentAccount });
+  //   console.log(result);
+  //   toast.success("Audit Process Done", {
+  //     position: "top-center",
+  //     autoClose: 4000,
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: true,
+  //     draggable: true,
+  //   });
+  // };
+
+  
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Assuming you have a way to get the connected wallet address
-    // const walletAddress = '0xYourConnectedWalletAddress';
+
     if (!currentAccount) {
       toast.error("Wallet not connected", {
         position: "top-center",
@@ -281,139 +426,60 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
         pauseOnHover: true,
         draggable: true,
       });
-      console.error("Current account is not set.");
       return; // Exit the function if currentAccount is null
     }
-    toast.info("Starting Audit Process", {
+
+    // Collect the user-provided code from the input (assuming you have an input for this)
+    const userCode = codeHash; // Assuming 'codeHash' state is holding the user input
+
+    toast.info("Hashing Code...", {
       position: "top-center",
-      autoClose: 4000,
+      autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
     });
 
-    // Replace 'yourContractAddress' with the actual contract address
-    const contractAddress = "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4";
-    // Replace 'yourContractABI' with the actual contract ABI
-    const contractABI = [
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "walletId",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "appId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "currentCodeHash",
-            "type": "bytes32"
-          }
-        ],
-        "name": "isAppCertified",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
+    // Make API call to backend to get SHA256 hash
+    fetch('http://localhost:3000/api/hash', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "walletId",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "appId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "appCodeHash",
-            "type": "bytes32"
-          }
-        ],
-        "name": "registerApp",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "name": "registry",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "applicationId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "codeHash",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bool",
-            "name": "isCertified",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "walletId",
-            "type": "address"
-          }
-        ],
-        "name": "revokeCertification",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      }
-    ];
+      body: JSON.stringify({ inputString: userCode })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const hashedCode = data.hash;
+      console.log('Received Hash:', hashedCode);
+      setCodeHash(hashedCode); // Update state with the hashed code
 
-    // Initialize web3 or ethers instance
-    const web3 = new Web3(window.ethereum); // If you're using Web3.js
+      // Here, you can proceed to use `hashedCode` for your contract call
+      toast.success("Code Hashed Successfully", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
 
-    // Create contract instance
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-    const result = await contract.methods
-      .registerApp(currentAccount, appId, codeHash)
-      .send({ from: currentAccount });
-    console.log(result);
-    toast.success("Audit Process Done", {
-      position: "top-center",
-      autoClose: 4000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
+      // Place to make the smart contract call with hashedCode
+      // For now, this part is skipped as per your instruction
+    })
+    .catch(error => {
+      console.error('Error hashing code:', error);
+      toast.error("Error in hashing code", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     });
-  };
-
-  
+};
 
   
   const decryptMessage = async (
