@@ -29,7 +29,7 @@ export const Decrypt = ({
     return <></>;
   }
 
-  const onDecrypt = () => {
+  const onDecrypt = async () => {
     console.log("called decrypt")
     if (!encryptedMessage) {
       return;
@@ -50,7 +50,18 @@ export const Decrypt = ({
         });
         return;
       }
-      decrypt(mk, appId, parseInt(appId), codeHash);
+      // Fetch the hashedCode from the API
+    const response = await fetch("http://localhost:5001/api/hash", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ inputString: appId }),
+    });
+    const data = await response.json();
+    const hashedCode = data.hash;
+    console.log("Received Hash:", hashedCode);
+      decrypt(mk, appId, parseInt(appId), "0x"+hashedCode);
       return;
     } else decrypt(mk);
   };
@@ -110,7 +121,7 @@ export const Decrypt = ({
             />
           </label>
           <label className="flex flex-col">
-            <h2>Code Hash</h2>
+            <h2>Code File</h2>
             <input
               type="text"
               value={codeHash}

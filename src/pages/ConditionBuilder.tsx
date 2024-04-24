@@ -150,7 +150,7 @@ export const ConditionBuilder = ({
   const [customCondition, setCustomCondition] = useState<CustomConditionType>(null);
 
   const rpcCondition = new conditions.base.rpc.RpcCondition({
-    chain: Mumbai.chainId,
+    chain: 80002,
     method: 'eth_getBalance',
     parameters: [':userAddress'],
     returnValueTest: {
@@ -275,7 +275,7 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
     const isCertified = new conditions.base.contract.ContractCondition({
       method: 'isAppCertified',
       parameters: [':walletId', ':appId',':currentCodeHash'],
-      contractAddress: '0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4',
+      contractAddress: '0xc7704363c8c16484F2cE06539d9B135146996a03',
       functionAbi: isAppCertifiedAbi,
       chain: 80001,
       returnValueTest: {

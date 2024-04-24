@@ -32,7 +32,7 @@ export default function App() {
 
   useEffect(() => {
     initialize();
-    switchNetwork(Mumbai.chainId);
+    switchNetwork(80002);
   }, []);
 
   

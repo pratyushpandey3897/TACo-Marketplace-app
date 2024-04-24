@@ -6,6 +6,7 @@ import { AccountContext } from '../App';
 import { toast } from 'react-toastify';
 import { Decrypt } from './Decrypt';
 import { useEthers, Mumbai } from "@usedapp/core";
+import auditContractJsonAbi from '../contracts/CertificationRegistry.json';
 import { ethers } from 'ethers';
 import { MoonLoader } from "react-spinners";
 import {
@@ -52,14 +53,18 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   const [audit, setAudit] = useState<boolean>(false);
   const [conditionNFTAddress, setConditionNFTAddress] = useState<string>("");
   const [validAccess, setValidAccess] = useState<boolean>(false);
+  const [hasAppId, setHasAppId] = useState<boolean>(true);
 
   const onEncryptedMessageChange = (newMessage: string) => {
     setEncryptedMessage(newMessage);
   };
 
+  //
+  const contractABI = 
+
   useEffect(() => {
     initialize();
-    switchNetwork(Mumbai.chainId);
+    switchNetwork(80002);
     // Fetch the asset details using the ID
     fetch(`http://localhost:5001/api/dataItems/${id}`)
        .then((response) => response.json())
@@ -116,7 +121,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       draggable: true,
     });
     const contractAddressCertification =
-      "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4"; //audti contract
+      "0xc7704363c8c16484F2cE06539d9B135146996a03"; //audti contract
     // Replace 'yourContractABI' with the actual contract ABI
     const contractABICertification = [
       {
@@ -294,7 +299,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   //   });
 
   //   // Replace 'yourContractAddress' with the actual contract address
-  //   const contractAddress = "0x958aF0BBEe232dA9E48DA3D6499f3b9285Ac2cb4";
+  //   const contractAddress = "0xc7704363c8c16484F2cE06539d9B135146996a03";
   //   // Replace 'yourContractABI' with the actual contract ABI
   //   const contractABI = [
   //     {
@@ -414,72 +419,110 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   // };
 
   
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleAuditSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+   
     if (!currentAccount) {
-      toast.error("Wallet not connected", {
-        position: "top-center",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      return; // Exit the function if currentAccount is null
+       toast.error("Wallet not connected", {
+         position: "top-center",
+         autoClose: 4000,
+         hideProgressBar: false,
+         closeOnClick: true,
+         pauseOnHover: true,
+         draggable: true,
+       });
+       return; // Exit the function if currentAccount is null
     }
-
+   
     // Collect the user-provided code from the input (assuming you have an input for this)
     const userCode = codeHash; // Assuming 'codeHash' state is holding the user input
-
+   
     toast.info("Hashing Code...", {
-      position: "top-center",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
+       position: "top-center",
+       autoClose: 2000,
+       hideProgressBar: false,
+       closeOnClick: true,
+       pauseOnHover: true,
+       draggable: true,
     });
-
+   
     // Make API call to backend to get SHA256 hash
-    fetch('http://localhost:3000/api/hash', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ inputString: userCode })
+    await fetch("http://localhost:5001/api/hash", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({ inputString: userCode }),
     })
-    .then(response => response.json())
-    .then(data => {
-      const hashedCode = data.hash;
-      console.log('Received Hash:', hashedCode);
-      setCodeHash(hashedCode); // Update state with the hashed code
+       .then(async (response) => { // Mark this function as async
+         const data = await response.json(); // Use await here
+         const hashedCode = data.hash;
+         console.log("Received Hash:", hashedCode);
+        //  setCodeHash(hashedCode); // Update state with the hashed code
+   
+         // Here, you can proceed to use `hashedCode` for your contract call
+         toast.success("Code Hashed Successfully", {
+           position: "top-center",
+           autoClose: 4000,
+           hideProgressBar: false,
+           closeOnClick: true,
+           pauseOnHover: true,
+           draggable: true,
+         });
+   
+         // Place to make the smart contract call with hashedCode
+         const web3 = new Web3(window.ethereum); // If you're using Web3.js
+         const contractAddress = "0xc7704363c8c16484F2cE06539d9B135146996a03";
+         const contract = new web3.eth.Contract(
+           auditContractJsonAbi.abi,
+           contractAddress
+         );
+   
+         try {
+           const result = await contract.methods
+             .registerApp(currentAccount, "0x"+hashedCode)
+             .send({ from: currentAccount });
+           console.log(result);
+           toast.success("Audit Process Done", {
+             position: "top-center",
+             autoClose: 4000,
+             hideProgressBar: false,
+             closeOnClick: true,
+             pauseOnHover: true,
+             draggable: true,
+           });
 
-      // Here, you can proceed to use `hashedCode` for your contract call
-      toast.success("Code Hashed Successfully", {
-        position: "top-center",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
-      // Place to make the smart contract call with hashedCode
-      // For now, this part is skipped as per your instruction
-    })
-    .catch(error => {
-      console.error('Error hashing code:', error);
-      toast.error("Error in hashing code", {
-        position: "top-center",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    });
-};
+           const appIdResult = await contract.methods
+             .getAppId(currentAccount, "0x"+hashedCode)
+             .call();
+           console.log(result);
+           console.log(appIdResult);
+           if (appIdResult)
+              setAppId(appIdResult.toString());
+         } catch (error) {
+           console.error("Error in audit process:", error);
+           toast.error("Error in audit process", {
+             position: "top-center",
+             autoClose: 4000,
+             hideProgressBar: false,
+             closeOnClick: true,
+             pauseOnHover: true,
+             draggable: true,
+           });
+         }
+       })
+       .catch((error) => {
+         console.error("Error hashing code:", error);
+         toast.error("Error in hashing code", {
+           position: "top-center",
+           autoClose: 4000,
+           hideProgressBar: false,
+           closeOnClick: true,
+           pauseOnHover: true,
+           draggable: true,
+         });
+       });
+   };
 
   
   const decryptMessage = async (
@@ -599,97 +642,120 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
         )}
       </div>
 
-      <h2 className="text-xl p-5 text-center">Check Access</h2>
-      <form
-        className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
-        onSubmit={handleCheckSubmit}
-      >
-        {validAccess ? (
-          <span className="bg-green-500 text-white font-bold py-2 rounded-full mx-auto">
-            Access Granted
-          </span>
-        ) : (
-          <span className="bg-red-500 text-white font-bold py-2 rounded-full mx-auto">
-            Access conditions not satisfied
-          </span>
-        )}
-        {conditionNFTAddress && (
-          <label className="flex flex-col">
-            <h2>NFT Address</h2>
-            <input
-              type="text"
-              value={conditionNFTAddress}
-              onChange={(e) => setConditionNFTAddress(e.target.value)}
-              className="border p-2 rounded"
-            />
-          </label>
-        )}
-        {audit ? (
-          <>
-            <label className="flex flex-col">
-              <h2>App ID</h2>
-              <input
-                type="text"
-                value={appId}
-                onChange={(e) => setAppId(e.target.value)}
-                className="border p-2 rounded"
-              />
-            </label>
-            <label className="flex flex-col">
-              <h2>Code Hash</h2>
-              <input
-                type="text"
-                value={codeHash}
-                onChange={(e) => setCodeHash(e.target.value)}
-                className="border p-2 rounded"
-              />
-            </label>
-          </>
-        ) : null}
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Validate Access Conditions
-        </button>
-      </form>
-      
-      {audit ? (
+      <h2 className="text-xl p-5 text-center">Verify if your app has Access</h2>
+<form
+ className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
+ onSubmit={handleCheckSubmit}
+>
+<div className="flex flex-col">
+ <label>
+    <input
+      type="radio"
+      value="yes"
+      checked={hasAppId}
+      onChange={(e) => setHasAppId(e.target.value === "yes")}
+    />
+    Yes, I have an APP ID provided by the marketplace and believe my app is audited.
+ </label>
+ <label>
+    <input
+      type="radio"
+      value="no"
+      checked={!hasAppId}
+      onChange={(e) => setHasAppId(e.target.value === "yes")}
+    />
+    No, I need to get app audited to get the APP ID.
+ </label>
+</div>
+ {hasAppId ? (
     <>
-      <h2 className="text-xl p-5 text-center">Smart Contract Audit</h2>
-      <form
-        className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
-        onSubmit={handleSubmit}
-      >
+      {validAccess ? (
+        <span className="bg-green-500 text-white font-bold py-2 rounded-full mx-auto">
+          Access Granted
+        </span>
+      ) : (
+        <span className="bg-red-500 text-white font-bold py-2 rounded-full mx-auto">
+          Access conditions not satisfied
+        </span>
+      )}
+      {conditionNFTAddress && (
         <label className="flex flex-col">
-          <h2>App ID</h2>
+          <h2>NFT Address</h2>
           <input
             type="text"
-            value={appId}
-            onChange={(e) => setAppId(e.target.value)}
+            value={conditionNFTAddress}
+            onChange={(e) => setConditionNFTAddress(e.target.value)}
             className="border p-2 rounded"
           />
         </label>
-        <label className="flex flex-col">
-          <h2>Code Hash</h2>
-          <input
-            type="text"
-            value={codeHash}
-            onChange={(e) => setCodeHash(e.target.value)}
-            className="border p-2 rounded"
-          />
-        </label>
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Get Audited
-        </button>
-      </form>
+      )}
+      <label className="flex flex-col">
+        <h2>App ID</h2>
+        <input
+          type="text"
+          value={appId}
+          onChange={(e) => setAppId(e.target.value)}
+          className="border p-2 rounded"
+        />
+      </label>
+      <label className="flex flex-col">
+        <h2>Code File</h2>
+        <input
+          type="text"
+          value={codeHash}
+          onChange={(e) => setCodeHash(e.target.value)}
+          className="border p-2 rounded"
+        />
+      </label>
+      <button
+    type="submit"
+    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+ >
+    Validate Access Conditions
+ </button>
     </>
  ) : (
-    <h2 className="text-xl p-5 text-center">Audit Not Needed</h2>
+    <p>You need to get app audited to get the APP ID.</p>
  )}
+ 
+</form>
+      
+{!hasAppId ? (
+ <>
+    <h2 className="text-xl p-5 text-center">Submit Code For Audit</h2>
+    <form
+      className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
+      onSubmit={handleAuditSubmit}
+    >
+      <label className="flex flex-col">
+        <h2>App ID</h2>
+        <input
+          type="text"
+          value={appId}
+          onChange={(e) => setAppId(e.target.value)}
+          className="border p-2 rounded"
+        />
+      </label>
+      <label className="flex flex-col">
+        <h2>Code Hash</h2>
+        <input
+          type="text"
+          value={codeHash}
+          onChange={(e) => setCodeHash(e.target.value)}
+          className="border p-2 rounded"
+        />
+      </label>
+      <button
+        type="submit"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Get Audited
+      </button>
+    </form>
+ </>
+) : (
+ <h2 className="text-xl p-5 text-center">Audit Not Needed</h2>
+)}
       <h2 className="text-xl p-5 text-center">Decrypt</h2>
       <div className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
         <label className="flex flex-col">

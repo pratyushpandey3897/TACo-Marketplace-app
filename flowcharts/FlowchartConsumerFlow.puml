@@ -6,10 +6,10 @@ if (Data asset contains NFT or ERC20 ownership?) then (yes)
  :Data Consumer buys NFT or ERC20 tokens;
 endif
 :Is it a new application code?;
-if (New application/code?) then (yes)
+if (New application/code?) then (Yes)
  :Data Consumer submits application code file;
  :Audit Backend Service audits code;
- if (Code is malicious?) then (yes)
+ if (Code is malicious?) then (Yes)
     :Audit Backend Service rejects application code;
  else (no)
     :Audit Backend Service creates code hash and generates Application ID;
@@ -19,9 +19,8 @@ if (New application/code?) then (yes)
  endif
 else (Application already audited)
  :Data Consumer submits application code file and Application ID;
- :Marketplace generates code hash;
- :Audit Backend Service returns code hash;
- :TACo decrypts request with context parameters;
+ :Marketplace requests code has from Audit Backend Service;
+ :TACo flow is onvoked with custom context parameters;
  :TACo fetches certification status;
  :TACo verifies access conditions;
  if (TACo conditions are met?) then (yes)
