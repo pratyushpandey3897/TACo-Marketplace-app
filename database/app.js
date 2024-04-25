@@ -61,6 +61,7 @@ app.post('/api/hash', (req, res) => {
       return res.status(400).send('Input string is required');
   }
   const hash = crypto.createHash('sha256').update(inputString).digest('hex');
+  console.log("hash",hash)
   res.send({ hash });
 });
 

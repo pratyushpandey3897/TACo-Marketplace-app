@@ -7,7 +7,7 @@ import {
   initialize,
   ThresholdMessageKit,
 } from '@nucypher/taco';
-import { Mumbai, useEthers } from '@usedapp/core';
+import { useEthers } from '@usedapp/core';
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 

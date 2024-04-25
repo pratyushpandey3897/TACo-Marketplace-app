@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useEthers, Mumbai } from "@usedapp/core";
+import { useEthers } from "@usedapp/core";
 import { ethers } from "ethers";
 import { ConditionBuilder } from "./ConditionBuilder";
 import { Encrypt } from "./Encrypt";

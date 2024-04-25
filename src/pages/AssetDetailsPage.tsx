@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { AccountContext } from '../App';
 import { toast } from 'react-toastify';
 import { Decrypt } from './Decrypt';
-import { useEthers, Mumbai } from "@usedapp/core";
+import { useEthers } from "@usedapp/core";
 import auditContractJsonAbi from '../contracts/CertificationRegistry.json';
 import { ethers } from 'ethers';
 import { MoonLoader } from "react-spinners";
@@ -542,6 +542,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     let customParameters:
       | Record<string, conditions.context.CustomContextParam>
       | undefined;
+      console.log(currentAccount,audit,walletId,appId,currentCodeHash,"details")
       if (currentAccount && audit && walletId && appId !== undefined && currentCodeHash) {
         customParameters = {
            ":walletId": currentAccount,
@@ -568,7 +569,8 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     let decryptedMessage: Uint8Array;
     try {
       console.log("reached here")
-      if (customParameters.appId) {
+      console.log(customParameters)
+      if (customParameters) {
         console.log("inside decrypt")
         decryptedMessage = await decrypt(
           provider,
@@ -727,17 +729,15 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
       onSubmit={handleAuditSubmit}
     >
+<label className="flex flex-col">
+  <h2>App ID</h2>
+  <div className="border p-2 rounded bg-gray-100">
+    {appId}
+  </div>
+</label>
+
       <label className="flex flex-col">
-        <h2>App ID</h2>
-        <input
-          type="text"
-          value={appId}
-          onChange={(e) => setAppId(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </label>
-      <label className="flex flex-col">
-        <h2>Code Hash</h2>
+        <h2>Code file</h2>
         <input
           type="text"
           value={codeHash}

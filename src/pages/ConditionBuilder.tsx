@@ -1,5 +1,5 @@
 import { conditions } from '@nucypher/taco';
-import { Mumbai, useEthers } from '@usedapp/core';
+import {  useEthers } from '@usedapp/core';
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 
@@ -39,104 +39,6 @@ const isAppCertifiedAbi: conditions.base.contract.FunctionAbiProps = {
   ],
 };
 //updated ABI
-
-const jsonArray = [
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "walletId",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "appId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "currentCodeHash",
-          "type": "bytes32"
-        }
-      ],
-      "name": "isAppCertified",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "walletId",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "appId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "appCodeHash",
-          "type": "bytes32"
-        }
-      ],
-      "name": "registerApp",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "registry",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "applicationId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "codeHash",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bool",
-          "name": "isCertified",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "walletId",
-          "type": "address"
-        }
-      ],
-      "name": "revokeCertification",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  
- ];
 
 export const ConditionBuilder = ({
   onConditionJsonChange,
@@ -241,7 +143,7 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
       parameters: [':userAddress'],
       standardContractType: 'ERC721',
       contractAddress: nftContractAddress,
-      chain: 80001,
+      chain: 80002,
       returnValueTest: {
         comparator: '>=',
         value: 1,
@@ -260,7 +162,7 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
       parameters: [':userAddress'],
       standardContractType: 'ERC20',
       contractAddress: erc20ContractAddress,
-      chain: 80001,
+      chain: 80002,
       returnValueTest: {
         comparator: '>=',
         value: parseInt(erc20Threshold, 10) * Math.pow(10, 18),
@@ -277,7 +179,7 @@ const onCreateCondition = (e: React.FormEvent<HTMLFormElement>) => {
       parameters: [':walletId', ':appId',':currentCodeHash'],
       contractAddress: '0xc7704363c8c16484F2cE06539d9B135146996a03',
       functionAbi: isAppCertifiedAbi,
-      chain: 80001,
+      chain: 80002,
       returnValueTest: {
         comparator: '==',
         value: true,
