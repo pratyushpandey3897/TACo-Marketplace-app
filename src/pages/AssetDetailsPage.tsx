@@ -1,13 +1,13 @@
 // AssetDetailsPage.tsx
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import Web3 from 'web3'; 
-import { AccountContext } from '../App';
-import { toast } from 'react-toastify';
-import { Decrypt } from './Decrypt';
+import React, { useEffect, useState, useContext } from "react";
+import { useParams } from "react-router-dom";
+import Web3 from "web3";
+import { AccountContext } from "../App";
+import { toast } from "react-toastify";
+import { Decrypt } from "./Decrypt";
 import { useEthers } from "@usedapp/core";
-import auditContractJsonAbi from '../contracts/CertificationRegistry.json';
-import { ethers } from 'ethers';
+import auditContractJsonAbi from "../contracts/CertificationRegistry.json";
+import { ethers } from "ethers";
 import { MoonLoader } from "react-spinners";
 import {
   initialize,
@@ -16,11 +16,11 @@ import {
   getPorterUri,
   domains,
   ThresholdMessageKit,
-} from '@nucypher/taco';
-import { DEFAULT_DOMAIN, DEFAULT_RITUAL_ID } from './config';
-import jsonABI from '../artifacts/NFTABI.json'
+} from "@nucypher/taco";
+import { DEFAULT_DOMAIN, DEFAULT_RITUAL_ID } from "./config";
+import jsonABI from "../artifacts/NFTABI.json";
 interface AssetDetailsPageProps {
- // Define any props if needed
+  // Define any props if needed
 }
 
 interface Asset {
@@ -60,37 +60,35 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   };
 
   //
-  const contractABI = 
-
-  useEffect(() => {
+  const contractABI = useEffect(() => {
     initialize();
     switchNetwork(80002);
     // Fetch the asset details using the ID
     fetch(`http://localhost:5001/api/dataItems/${id}`)
-       .then((response) => response.json())
-       .then((data) => {
-         setAsset(data); // Assuming 'setAsset' is the state update function for 'asset'
-         if (data && data.Condition) {
-           // Parse the Condition string into a JSON object
-           const conditionJson = JSON.parse(data.Condition);
-           // Extract the NFTAddress and Audit status
-           const { NFTAddress, Audit } = conditionJson;
-           // Set the nftAddress state
-           setConditionNFTAddress(NFTAddress);
-           // If Audit is true, set the audit state
-           if (Audit) {
-             setAudit(true);
-           }
-         }
-         if (data && data.EncryptedBytes) {
-           setEncryptedMessage(data.EncryptedBytes);
-           console.log("Encrypted message set:", data.EncryptedBytes);
-         }
-       })
-       .catch((error) => {
-         console.error("Error fetching asset details:", error);
-       });
-   }, [id]);// Depend on the ID to refetch if it changes
+      .then((response) => response.json())
+      .then((data) => {
+        setAsset(data); // Assuming 'setAsset' is the state update function for 'asset'
+        if (data && data.Condition) {
+          // Parse the Condition string into a JSON object
+          const conditionJson = JSON.parse(data.Condition);
+          // Extract the NFTAddress and Audit status
+          const { NFTAddress, Audit } = conditionJson;
+          // Set the nftAddress state
+          setConditionNFTAddress(NFTAddress);
+          // If Audit is true, set the audit state
+          if (Audit) {
+            setAudit(true);
+          }
+        }
+        if (data && data.EncryptedBytes) {
+          setEncryptedMessage(data.EncryptedBytes);
+          console.log("Encrypted message set:", data.EncryptedBytes);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching asset details:", error);
+      });
+  }, [id]); // Depend on the ID to refetch if it changes
 
   //  if (!asset) {
   //     return <div>Loading...</div>; // Or a loading spinner
@@ -122,456 +120,232 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     });
     const contractAddressCertification =
       "0xc7704363c8c16484F2cE06539d9B135146996a03"; //audti contract
-    // Replace 'yourContractABI' with the actual contract ABI
-    const contractABICertification = [
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "walletId",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "appId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "appCodeHash",
-            "type": "bytes32"
-          }
-        ],
-        "name": "registerApp",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "walletId",
-            "type": "address"
-          }
-        ],
-        "name": "revokeCertification",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "walletId",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "appId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "currentCodeHash",
-            "type": "bytes32"
-          }
-        ],
-        "name": "isAppCertified",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "name": "registry",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "applicationId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "codeHash",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bool",
-            "name": "isCertified",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ];
     const web3 = new Web3(window.ethereum);
     // Create contract instance
     const contract = new web3.eth.Contract(
-      contractABICertification,
+      auditContractJsonAbi.abi,
       contractAddressCertification
     );
     var nftContract, hasNft;
     if (currentAccount && conditionNFTAddress) {
       nftContract = new web3.eth.Contract(jsonABI, conditionNFTAddress);
       const balance = await nftContract.methods
-         .balanceOf(currentAccount)
-         .call();
-     
+        .balanceOf(currentAccount)
+        .call();
+
       const numericBalance = Number(balance);
-      console.log("number",numericBalance);
-       // This ensures 'balance' is treated as a number
+      console.log("number", numericBalance);
+      // This ensures 'balance' is treated as a number
       hasNft = numericBalance > 0;
       console.log(hasNft);
-     }
-     
-     var appCertified
-     if (audit) {
+    }
+
+    var appCertified;
+    if (audit) {
+      //call code hash api
+      const hashedCode = await getHashFromAPI(codeHash);
+
       // Check app certification
       const appCertifiedPromise = contract.methods
-         .isAppCertified(currentAccount, appId, codeHash)
-         .call();
+        .isAppCertified(currentAccount, appId, "0x" + hashedCode)
+        .call();
       appCertified = await appCertifiedPromise.then((result) =>
-         Boolean(result)
+        Boolean(result)
       );
-     
+
       // Additional logic that depends on appCertified can go here
-     }
-     
-     // Determine valid access based on the presence of NFT and app certification
-     if (hasNft !== undefined && appCertified !== undefined) {
+    }
+
+    // Determine valid access based on the presence of NFT and app certification
+    if (hasNft !== undefined && appCertified !== undefined) {
       setValidAccess(hasNft && appCertified);
-     } else if (hasNft !== undefined) {
+    } else if (hasNft !== undefined) {
       setValidAccess(hasNft);
-     } else if (appCertified !== undefined) {
+    } else if (appCertified !== undefined) {
       setValidAccess(appCertified);
-     }
-     
-     console.log("App certified:", appCertified, hasNft, "Valid Access:", validAccess);
-     toast.success("Access Conditions Checked", {
+    }
+
+    console.log(
+      "App certified:",
+      appCertified,
+      hasNft,
+      "Valid Access:",
+      validAccess
+    );
+    toast.success("Access Conditions Checked", {
       position: "top-center",
       autoClose: 4000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
-     });
-     
+    });
   };
 
-  // const handleSubmit = async (event: React.FormEvent) => {
-  //   event.preventDefault();
-  //   // Assuming you have a way to get the connected wallet address
-  //   // const walletAddress = '0xYourConnectedWalletAddress';
-  //   if (!currentAccount) {
-  //     toast.error("Wallet not connected", {
-  //       position: "top-center",
-  //       autoClose: 4000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //     });
-  //     console.error("Current account is not set.");
-  //     return; // Exit the function if currentAccount is null
-  //   }
-  //   toast.info("Starting Audit Process", {
-  //     position: "top-center",
-  //     autoClose: 4000,
-  //     hideProgressBar: false,
-  //     closeOnClick: true,
-  //     pauseOnHover: true,
-  //     draggable: true,
-  //   });
-
-  //   // Replace 'yourContractAddress' with the actual contract address
-  //   const contractAddress = "0xc7704363c8c16484F2cE06539d9B135146996a03";
-  //   // Replace 'yourContractABI' with the actual contract ABI
-  //   const contractABI = [
-  //     {
-  //       "inputs": [
-  //         {
-  //           "internalType": "address",
-  //           "name": "walletId",
-  //           "type": "address"
-  //         },
-  //         {
-  //           "internalType": "uint256",
-  //           "name": "appId",
-  //           "type": "uint256"
-  //         },
-  //         {
-  //           "internalType": "bytes32",
-  //           "name": "currentCodeHash",
-  //           "type": "bytes32"
-  //         }
-  //       ],
-  //       "name": "isAppCertified",
-  //       "outputs": [
-  //         {
-  //           "internalType": "bool",
-  //           "name": "",
-  //           "type": "bool"
-  //         }
-  //       ],
-  //       "stateMutability": "view",
-  //       "type": "function"
-  //     },
-  //     {
-  //       "inputs": [
-  //         {
-  //           "internalType": "address",
-  //           "name": "walletId",
-  //           "type": "address"
-  //         },
-  //         {
-  //           "internalType": "uint256",
-  //           "name": "appId",
-  //           "type": "uint256"
-  //         },
-  //         {
-  //           "internalType": "bytes32",
-  //           "name": "appCodeHash",
-  //           "type": "bytes32"
-  //         }
-  //       ],
-  //       "name": "registerApp",
-  //       "outputs": [],
-  //       "stateMutability": "nonpayable",
-  //       "type": "function"
-  //     },
-  //     {
-  //       "inputs": [
-  //         {
-  //           "internalType": "address",
-  //           "name": "",
-  //           "type": "address"
-  //         }
-  //       ],
-  //       "name": "registry",
-  //       "outputs": [
-  //         {
-  //           "internalType": "uint256",
-  //           "name": "applicationId",
-  //           "type": "uint256"
-  //         },
-  //         {
-  //           "internalType": "bytes32",
-  //           "name": "codeHash",
-  //           "type": "bytes32"
-  //         },
-  //         {
-  //           "internalType": "bool",
-  //           "name": "isCertified",
-  //           "type": "bool"
-  //         }
-  //       ],
-  //       "stateMutability": "view",
-  //       "type": "function"
-  //     },
-  //     {
-  //       "inputs": [
-  //         {
-  //           "internalType": "address",
-  //           "name": "walletId",
-  //           "type": "address"
-  //         }
-  //       ],
-  //       "name": "revokeCertification",
-  //       "outputs": [],
-  //       "stateMutability": "nonpayable",
-  //       "type": "function"
-  //     }
-  //   ];
-
-  //   // Initialize web3 or ethers instance
-  //   const web3 = new Web3(window.ethereum); // If you're using Web3.js
-
-  //   // Create contract instance
-  //   const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-  //   const result = await contract.methods
-  //     .registerApp(currentAccount, appId, codeHash)
-  //     .send({ from: currentAccount });
-  //   console.log(result);
-  //   toast.success("Audit Process Done", {
-  //     position: "top-center",
-  //     autoClose: 4000,
-  //     hideProgressBar: false,
-  //     closeOnClick: true,
-  //     pauseOnHover: true,
-  //     draggable: true,
-  //   });
-  // };
-
-  
   const handleAuditSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-   
+
     if (!currentAccount) {
-       toast.error("Wallet not connected", {
-         position: "top-center",
-         autoClose: 4000,
-         hideProgressBar: false,
-         closeOnClick: true,
-         pauseOnHover: true,
-         draggable: true,
-       });
-       return; // Exit the function if currentAccount is null
+      toast.error("Wallet not connected", {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return; // Exit the function if currentAccount is null
     }
-   
+
     // Collect the user-provided code from the input (assuming you have an input for this)
     const userCode = codeHash; // Assuming 'codeHash' state is holding the user input
-   
+
     toast.info("Hashing Code...", {
-       position: "top-center",
-       autoClose: 2000,
-       hideProgressBar: false,
-       closeOnClick: true,
-       pauseOnHover: true,
-       draggable: true,
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
     });
-   
+
     // Make API call to backend to get SHA256 hash
     await fetch("http://localhost:5001/api/hash", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({ inputString: userCode }),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ inputString: userCode }),
     })
-       .then(async (response) => { // Mark this function as async
-         const data = await response.json(); // Use await here
-         const hashedCode = data.hash;
-         console.log("Received Hash:", hashedCode);
+      .then(async (response) => {
+        // Mark this function as async
+        const data = await response.json(); // Use await here
+        const hashedCode = data.hash;
+        console.log("Received Hash:", hashedCode);
         //  setCodeHash(hashedCode); // Update state with the hashed code
-   
-         // Here, you can proceed to use `hashedCode` for your contract call
-         toast.success("Code Hashed Successfully", {
-           position: "top-center",
-           autoClose: 4000,
-           hideProgressBar: false,
-           closeOnClick: true,
-           pauseOnHover: true,
-           draggable: true,
-         });
-   
-         // Place to make the smart contract call with hashedCode
-         const web3 = new Web3(window.ethereum); // If you're using Web3.js
-         const contractAddress = "0xc7704363c8c16484F2cE06539d9B135146996a03";
-         const contract = new web3.eth.Contract(
-           auditContractJsonAbi.abi,
-           contractAddress
-         );
-   
-         try {
-           const result = await contract.methods
-             .registerApp(currentAccount, "0x"+hashedCode)
-             .send({ from: currentAccount });
-           console.log(result);
-           toast.success("Audit Process Done", {
-             position: "top-center",
-             autoClose: 4000,
-             hideProgressBar: false,
-             closeOnClick: true,
-             pauseOnHover: true,
-             draggable: true,
-           });
 
-           const appIdResult = await contract.methods
-             .getAppId(currentAccount, "0x"+hashedCode)
-             .call();
-           console.log(result);
-           console.log(appIdResult);
-           if (appIdResult)
-              setAppId(appIdResult.toString());
-         } catch (error) {
-           console.error("Error in audit process:", error);
-           toast.error("Error in audit process", {
-             position: "top-center",
-             autoClose: 4000,
-             hideProgressBar: false,
-             closeOnClick: true,
-             pauseOnHover: true,
-             draggable: true,
-           });
-         }
-       })
-       .catch((error) => {
-         console.error("Error hashing code:", error);
-         toast.error("Error in hashing code", {
-           position: "top-center",
-           autoClose: 4000,
-           hideProgressBar: false,
-           closeOnClick: true,
-           pauseOnHover: true,
-           draggable: true,
-         });
-       });
-   };
+        // Here, you can proceed to use `hashedCode` for your contract call
+        toast.success("Code Hashed Successfully", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
 
-  
+        // Place to make the smart contract call with hashedCode
+        const web3 = new Web3(window.ethereum); // If you're using Web3.js
+        const contractAddress = "0xc7704363c8c16484F2cE06539d9B135146996a03";
+        const contract = new web3.eth.Contract(
+          auditContractJsonAbi.abi,
+          contractAddress
+        );
+
+        try {
+          const result = await contract.methods
+            .registerApp(currentAccount, "0x" + hashedCode)
+            .send({ from: currentAccount });
+          console.log(result);
+          toast.success("Audit Process Done", {
+            position: "top-center",
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+
+          const appIdResult = await contract.methods
+            .getAppId(currentAccount, "0x" + hashedCode)
+            .call();
+          console.log(result);
+          console.log(appIdResult);
+          if (appIdResult) setAppId(appIdResult.toString());
+        } catch (error) {
+          console.error("Error in audit process:", error);
+          toast.error("Error in audit process", {
+            position: "top-center",
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error hashing code:", error);
+        toast.error("Error in hashing code", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      });
+  };
+
   const decryptMessage = async (
     encryptedMessage: ThresholdMessageKit,
     walletId?: string,
     appId?: number,
     currentCodeHash?: string
-  ): Promise<void>  => {
+  ): Promise<void> => {
     // if (!condition) {
     //   return;
     // }z
     setLoading(true);
     setDecryptedMessage("");
     setDecryptionErrors([]);
-    
+
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     let customParameters:
       | Record<string, conditions.context.CustomContextParam>
       | undefined;
-      console.log(currentAccount,audit,walletId,appId,currentCodeHash,"details")
-      if (currentAccount && audit && walletId && appId !== undefined && currentCodeHash) {
-        customParameters = {
-           ":walletId": currentAccount,
-           ":appId": appId,
-           ":currentCodeHash": currentCodeHash,
-        };
-        console.log(customParameters);
-       } else {
-        // Check for specific conditions and display toast errors accordingly
-        if (!currentAccount || currentAccount === "") {
-           toast.error("Current account is not set or is empty.", {
-             position: "top-center",
-             autoClose: 4000,
-             hideProgressBar: false,
-             closeOnClick: true,
-             pauseOnHover: true,
-             draggable: true,
-           });
-           
-        }
-        setLoading(false);
-        return;
-       }
+    console.log(
+      currentAccount,
+      audit,
+      walletId,
+      appId,
+      currentCodeHash,
+      "details"
+    );
+    if (
+      currentAccount &&
+      audit &&
+      walletId &&
+      appId !== undefined &&
+      currentCodeHash
+    ) {
+      customParameters = {
+        ":walletId": currentAccount,
+        ":appId": appId,
+        ":currentCodeHash": currentCodeHash,
+      };
+      console.log(customParameters);
+    } else {
+      // Check for specific conditions and display toast errors accordingly
+      if (!currentAccount || currentAccount === "") {
+        toast.error("Current account is not set or is empty.", {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+      setLoading(false);
+      return;
+    }
     let decryptedMessage: Uint8Array;
     try {
-      console.log("reached here")
-      console.log(customParameters)
+      console.log("reached here");
+      console.log(customParameters);
       if (customParameters) {
-        console.log("inside decrypt")
+        console.log("inside decrypt");
         decryptedMessage = await decrypt(
           provider,
           domain,
@@ -581,7 +355,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
           customParameters
         );
       } else {
-        console.log("entered")
+        console.log("entered");
         decryptedMessage = await decrypt(
           provider,
           domain,
@@ -601,21 +375,46 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
         pauseOnHover: true,
         draggable: true,
       });
-     } catch (error) {
+    } catch (error) {
       console.error("Decryption error:", error);
       setLoading(false);
-      toast.error("Threshold of responses not met; TACo decryption failed with errors", {
-         position: "top-center",
-         autoClose: 4000,
-         hideProgressBar: false,
-         closeOnClick: true,
-         pauseOnHover: true,
-         draggable: true,
-      });
-     }
-
-    
+      toast.error(
+        "Threshold of responses not met; TACo decryption failed with errors",
+        {
+          position: "top-center",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+    }
   };
+
+  async function getHashFromAPI(userCode: string): Promise<string> {
+    try {
+      const response = await fetch("http://localhost:5001/api/hash", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputString: userCode }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch hash from API");
+      }
+
+      const data = await response.json();
+      const hashedCode = data.hash;
+      console.log("Received Hash:", hashedCode);
+      return hashedCode;
+    } catch (error) {
+      console.error("Error hashing code:", error);
+      throw error; // Rethrow the error to be handled by the caller
+    }
+  }
 
   return (
     <div className="rounded-md h-full overflow-y-scroll">
@@ -639,123 +438,152 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
                 Owner Address: {asset.owneraddress}
               </p>
             </div>
-            
           </div>
         )}
       </div>
 
-      <h2 className="text-xl p-5 text-center">Verify if your app has Access</h2>
-<form
- className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
- onSubmit={handleCheckSubmit}
->
-<div className="flex flex-col">
- <label>
-    <input
-      type="radio"
-      value="yes"
-      checked={hasAppId}
-      onChange={(e) => setHasAppId(e.target.value === "yes")}
-    />
-    Yes, I have an APP ID provided by the marketplace and believe my app is audited.
- </label>
- <label>
-    <input
-      type="radio"
-      value="no"
-      checked={!hasAppId}
-      onChange={(e) => setHasAppId(e.target.value === "yes")}
-    />
-    No, I need to get app audited to get the APP ID.
- </label>
-</div>
- {hasAppId ? (
-    <>
-      {validAccess ? (
-        <span className="bg-green-500 text-white font-bold py-2 rounded-full mx-auto">
-          Access Granted
-        </span>
-      ) : (
-        <span className="bg-red-500 text-white font-bold py-2 rounded-full mx-auto">
-          Access conditions not satisfied
-        </span>
-      )}
-      {conditionNFTAddress && (
-        <label className="flex flex-col">
-          <h2>NFT Address</h2>
-          <input
-            type="text"
-            value={conditionNFTAddress}
-            onChange={(e) => setConditionNFTAddress(e.target.value)}
-            className="border p-2 rounded"
-          />
-        </label>
-      )}
-      <label className="flex flex-col">
-        <h2>App ID</h2>
-        <input
-          type="text"
-          value={appId}
-          onChange={(e) => setAppId(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </label>
-      <label className="flex flex-col">
-        <h2>Code File</h2>
-        <input
-          type="text"
-          value={codeHash}
-          onChange={(e) => setCodeHash(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </label>
-      <button
-    type="submit"
-    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
- >
-    Validate Access Conditions
- </button>
-    </>
- ) : (
-    <p>You need to get app audited to get the APP ID.</p>
- )}
- 
-</form>
-      
-{!hasAppId ? (
- <>
-    <h2 className="text-xl p-5 text-center">Submit Code For Audit</h2>
-    <form
-      className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
-      onSubmit={handleAuditSubmit}
-    >
-<label className="flex flex-col">
-  <h2>App ID</h2>
-  <div className="border p-2 rounded bg-gray-100">
-    {appId}
-  </div>
-</label>
-
-      <label className="flex flex-col">
-        <h2>Code file</h2>
-        <input
-          type="text"
-          value={codeHash}
-          onChange={(e) => setCodeHash(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </label>
-      <button
-        type="submit"
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      <h2 className="text-xl p-5 text-center">Verify your audit status</h2>
+      <form
+        className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
+        onSubmit={handleCheckSubmit}
       >
-        Get Audited
-      </button>
-    </form>
- </>
-) : (
- <h2 className="text-xl p-5 text-center">Audit Not Needed</h2>
-)}
+        <div className="flex flex-col">
+          <label>
+            <input
+              type="radio"
+              value="yes"
+              checked={hasAppId}
+              onChange={(e) => setHasAppId(e.target.value === "yes")}
+            />
+            Yes, I have an APP ID provided by the marketplace and believe my app
+            is audited.
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="no"
+              checked={!hasAppId}
+              onChange={(e) => setHasAppId(e.target.value === "yes")}
+            />
+            No, I need to get app audited to get the APP ID.
+          </label>
+        </div>
+        {hasAppId ? (
+          <>
+            {validAccess ? (
+              <span className="bg-green-500 text-white font-bold py-2 rounded-full mx-auto">
+                Code Already Audited
+              </span>
+            ) : (
+              <span className="bg-red-500 text-white font-bold py-2 rounded-full mx-auto">
+                Code Needs Audit
+              </span>
+            )}
+            {conditionNFTAddress && (
+              <label className="flex flex-col">
+                <h2>NFT Address</h2>
+                <input
+                  type="text"
+                  value={conditionNFTAddress}
+                  onChange={(e) => setConditionNFTAddress(e.target.value)}
+                  className="border p-2 rounded"
+                />
+              </label>
+            )}
+            <label className="flex flex-col">
+              <h2>App ID</h2>
+              <input
+                type="text"
+                value={appId}
+                onChange={(e) => setAppId(e.target.value)}
+                className="border p-2 rounded"
+              />
+            </label>
+            <label className="flex flex-col">
+              <h2>Upload Code File</h2>
+              <input
+                type="file"
+                accept=".txt"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      if (
+                        event.target &&
+                        typeof event.target.result === "string"
+                      ) {
+                        const fileContent = event.target.result;
+                        setCodeHash(fileContent);
+                        // Optionally, call your hash function here with trimmedContent
+                      }
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+                className="border p-2 rounded"
+              />
+            </label>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Validate Access Conditions
+            </button>
+          </>
+        ) : (
+          <p>You need to get app audited to get the APP ID.</p>
+        )}
+      </form>
+
+      {!hasAppId ? (
+        <>
+          <h2 className="text-xl p-5 text-center">Submit Code For Audit</h2>
+          <form
+            className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg"
+            onSubmit={handleAuditSubmit}
+          >
+            <label className="flex flex-col">
+              <h2>App ID</h2>
+              <div className="border p-2 rounded bg-gray-100">{appId}</div>
+            </label>
+
+            <label className="flex flex-col">
+              <h2>Upload Code File</h2>
+              <input
+                type="file"
+                accept=".txt"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      if (
+                        event.target &&
+                        typeof event.target.result === "string"
+                      ) {
+                        const fileContent = event.target.result;
+                        setCodeHash(fileContent);
+                        // Optionally, call your hash function here with trimmedContent
+                      }
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+                className="border p-2 rounded"
+              />
+            </label>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Get Audited
+            </button>
+          </form>
+        </>
+      ) : (
+        <h2 className="text-xl p-5 text-center">Audit Not Needed</h2>
+      )}
       <h2 className="text-xl p-5 text-center">Decrypt</h2>
       <div className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
         <label className="flex flex-col">
@@ -791,4 +619,4 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   );
 };
 
-export default AssetDetailsPage
+export default AssetDetailsPage;

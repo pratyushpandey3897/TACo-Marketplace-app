@@ -5,6 +5,7 @@ import { saveDataItem } from '../Services/AddItem'; // Adjust the import path as
 import { ThresholdMessageKit,conditions } from '@nucypher/taco';
 import { AccountContext } from "../App";
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 interface Props {
   enabled: boolean;
@@ -28,11 +29,13 @@ export const Encrypt = ({
 }: Props) => {
   const [plaintext, setPlaintext] = useState("plaintext");
   const {currentAccount} = useContext(AccountContext);
+  const navigate = useNavigate();
   const onClickEncrypt = () => {
     encrypt(plaintext);
   };
 
-  const onClickPublish = async () => {
+  const onClickPublish = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!encryptedMessage) {
       console.error("No encrypted message available for publishing.");
       return;
@@ -64,6 +67,7 @@ export const Encrypt = ({
         pauseOnHover: true,
         draggable: true,
       });
+      navigate('/');
     } catch (error) {
       console.error("Failed to save data item:", error);
       alert("Error saving data item.");

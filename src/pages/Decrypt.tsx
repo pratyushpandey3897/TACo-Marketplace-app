@@ -1,17 +1,22 @@
-import { ThresholdMessageKit } from '@nucypher/taco';
-import React, { useState } from 'react';
-import { Buffer } from 'buffer';
-import { toast } from 'react-toastify';
+import { ThresholdMessageKit } from "@nucypher/taco";
+import React, { useState } from "react";
+import { Buffer } from "buffer";
+import { toast } from "react-toastify";
 
 interface Props {
   enabled: boolean;
-  decrypt: (encryptedMessage: ThresholdMessageKit, walletId?: string, appId?: number, currentCodeHash?: string) => Promise<void>;
+  decrypt: (
+    encryptedMessage: ThresholdMessageKit,
+    walletId?: string,
+    appId?: number,
+    currentCodeHash?: string
+  ) => Promise<void>;
   decryptedMessage?: string | undefined;
   decryptionErrors: string[];
   encryptedMessage: string;
   audit: boolean;
   onEncryptedMessageChange: (newMessage: string) => void;
- }
+}
 
 export const Decrypt = ({
   decrypt,
@@ -30,13 +35,13 @@ export const Decrypt = ({
   }
 
   const onDecrypt = async () => {
-    console.log("called decrypt")
+    console.log("called decrypt");
     if (!encryptedMessage) {
       return;
     }
     const mkBytes = Buffer.from(encryptedMessage, "base64");
     const mk = ThresholdMessageKit.fromBytes(mkBytes);
-    console.log(mk)
+    console.log(mk);
     if (audit) {
       if (!appId || !codeHash) {
         console.log("App ID and Code Hash are required for audit mode");
@@ -51,17 +56,17 @@ export const Decrypt = ({
         return;
       }
       // Fetch the hashedCode from the API
-    const response = await fetch("http://localhost:5001/api/hash", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ inputString: appId }),
-    });
-    const data = await response.json();
-    const hashedCode = data.hash;
-    console.log("Received Hash:", hashedCode);
-      decrypt(mk, appId, parseInt(appId), "0x"+hashedCode);
+      const response = await fetch("http://localhost:5001/api/hash", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputString: codeHash }),
+      });
+      const data = await response.json();
+      const hashedCode = data.hash;
+      console.log("Received Hash:", hashedCode);
+      decrypt(mk, appId, parseInt(appId), "0x" + hashedCode);
       return;
     } else decrypt(mk);
   };
@@ -121,11 +126,27 @@ export const Decrypt = ({
             />
           </label>
           <label className="flex flex-col">
-            <h2>Code File</h2>
+            <h2>Upload Code File</h2>
             <input
-              type="text"
-              value={codeHash}
-              onChange={(e) => setCodeHash(e.target.value)}
+              type="file"
+              accept=".txt"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  const file = e.target.files[0];
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    if (
+                      event.target &&
+                      typeof event.target.result === "string"
+                    ) {
+                      const fileContent = event.target.result;
+                      setCodeHash(fileContent);
+                      // Optionally, call your hash function here with trimmedContent
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
               className="border p-2 rounded"
             />
           </label>

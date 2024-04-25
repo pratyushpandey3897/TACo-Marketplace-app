@@ -26,7 +26,7 @@ const LandingPage: React.FC = () => {
     fetch('http://localhost:5001/api/dataItems')
       .then(response => response.json())
       .then(data => {
-        setDataItems(data.slice(0, 10)); // Get top 10 items
+        setDataItems(data.slice(0, 20)); // Get top 10 items
         setIsLoading(false); // Set loading to false after data is fetched
       })
       .catch(error => {
