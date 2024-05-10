@@ -1,5 +1,5 @@
 // AssetDetailsPage.tsx
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, FormEvent, ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
 import Web3 from "web3";
 import { AccountContext } from "../App";
@@ -38,6 +38,8 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   const { id } = useParams(); // Get the asset ID from the URL
   const [asset, setAsset] = useState<Asset | null>(null); // State to hold the asset details
   const [appId, setAppId] = useState("");
+  const [modelFile, setModelFile] = useState<File | null>(null);
+  const [requirementsFile, setRequirementsFile] = useState<File | null>(null);
   const [codeHash, setCodeHash] = useState("");
   const { currentAccount } = useContext(AccountContext);
   const [checkResults, setCheckResults] = useState({
@@ -415,7 +417,42 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       throw error; // Rethrow the error to be handled by the caller
     }
   }
+  const onModelFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setModelFile(event.target.files[0]);
+    }
+  };
 
+  const onRequirementsFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setRequirementsFile(event.target.files[0]);
+    }
+  };
+
+  const handleModelSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (modelFile && requirementsFile && decryptedMessage) {
+      const formData = new FormData();
+      formData.append('model', modelFile);
+      formData.append('requirements', requirementsFile);
+      formData.append('data', new Blob([decryptedMessage], { type: 'text/plain' }));
+
+      try {
+        const response = await fetch('http://localhost:3000/process-data', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+        console.log(result);
+        toast.success('Model processed successfully. Check the console for results.');
+      } catch (error) {
+        console.error('Error uploading files:', error);
+        toast.error('Failed to process the model.');
+      }
+    } else {
+      toast.error('Please select a model file, a requirements file, and ensure data is decrypted.');
+    }
+  };
   return (
     <div className="rounded-md h-full overflow-y-scroll">
       <div className="flex justify-between items-center p-5">
@@ -615,6 +652,11 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
           onEncryptedMessageChange={onEncryptedMessageChange} // Pass the function to update the encryptedMessage state
         />
       )}
+     <form onSubmit={handleModelSubmit}>
+        <input type="file" onChange={onModelFileChange} accept=".py" />
+        <input type="file" onChange={onRequirementsFileChange} accept=".txt" />
+        <button type="submit">Upload and Process Model</button>
+      </form>
     </div>
   );
 };

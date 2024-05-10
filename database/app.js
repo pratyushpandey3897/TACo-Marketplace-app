@@ -3,6 +3,11 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const cors = require('cors');
 const crypto = require('crypto');
+const multer = require('multer');
+const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
 require('./configs/database.config.js');
 const DataItem = require('./models/DataItem'); // Make sure the path is correct
 
@@ -64,6 +69,63 @@ app.post('/api/hash', (req, res) => {
   console.log("hash",hash)
   res.send({ hash });
 });
+// Configure multer for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+
+// Endpoint to upload and process model
+app.post('/upload-model', upload.fields([{ name: 'model', maxCount: 1 }, { name: 'requirements', maxCount: 1 }]), (req, res) => {
+  const modelFile = req.files['model'][0];
+  const requirementsFile = req.files['requirements'][0];
+
+  buildAndRunDockerContainer(modelFile, requirementsFile, res);
+});
+
+function buildAndRunDockerContainer(modelFile, requirementsFile, res) {
+  const dockerImageName = `usermodel-${Date.now()}`;
+  const modelFilePath = modelFile.path;
+  const requirementsFilePath = requirementsFile.path;
+
+  // Generate a Dockerfile
+  const dockerfileContent = `
+FROM python:3.8-slim
+WORKDIR /app
+COPY ${path.basename(requirementsFilePath)} /app/
+RUN pip install --no-cache-dir -r ${path.basename(requirementsFilePath)}
+COPY ${path.basename(modelFilePath)} /app/model.py
+CMD ["python", "model.py"]
+  `;
+
+  fs.writeFileSync('Dockerfile', dockerfileContent);
+
+  // Build Docker image
+  exec(`docker build -t ${dockerImageName} .`, (error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+          return res.status(500).send({ message: 'Failed to build Docker image', details: stderr });
+      }
+
+      // Run Docker container
+      exec(`docker run --rm ${dockerImageName}`, (error, stdout, stderr) => {
+          // Optionally, clean up Docker image after execution
+          exec(`docker rmi ${dockerImageName}`);
+          if (error) {
+              console.error(`exec error: ${error}`);
+              return res.status(500).send({ message: 'Failed to run Docker container', details: stderr });
+          }
+
+          res.send({ results: stdout });
+      });
+  });
+}
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
