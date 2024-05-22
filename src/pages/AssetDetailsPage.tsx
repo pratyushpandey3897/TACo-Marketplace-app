@@ -18,7 +18,9 @@ import {
   ThresholdMessageKit,
 } from "@nucypher/taco";
 import { DEFAULT_DOMAIN, DEFAULT_RITUAL_ID } from "./config";
+import { Buffer } from 'buffer';
 import jsonABI from "../artifacts/NFTABI.json";
+import { saveAs } from 'file-saver'; // npm install file-saver
 interface AssetDetailsPageProps {
   // Define any props if needed
 }
@@ -39,6 +41,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
   const [asset, setAsset] = useState<Asset | null>(null); // State to hold the asset details
   const [appId, setAppId] = useState("");
   const [modelFile, setModelFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [requirementsFile, setRequirementsFile] = useState<File | null>(null);
   const [codeHash, setCodeHash] = useState("");
   const { currentAccount } = useContext(AccountContext);
@@ -143,7 +146,7 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
     }
 
     var appCertified;
-    if (audit) {
+    if (audit) {  
       //call code hash api
       const hashedCode = await getHashFromAPI(codeHash);
 
@@ -182,6 +185,10 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       pauseOnHover: true,
       draggable: true,
     });
+  };
+  const convertTextToCSV = (text: string) => {
+    const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
+    saveAs(blob, "decryptedData.csv");
   };
 
   const handleAuditSubmit = async (event: React.FormEvent) => {
@@ -342,13 +349,13 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       setLoading(false);
       return;
     }
-    let decryptedMessage: Uint8Array;
+    let decryptedMessagetemp: Uint8Array;
     try {
       console.log("reached here");
       console.log(customParameters);
       if (customParameters) {
         console.log("inside decrypt");
-        decryptedMessage = await decrypt(
+        decryptedMessagetemp = await decrypt(
           provider,
           domain,
           encryptedMessage,
@@ -358,16 +365,19 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
         );
       } else {
         console.log("entered");
-        decryptedMessage = await decrypt(
+        decryptedMessagetemp = await decrypt(
           provider,
           domain,
           encryptedMessage,
           getPorterUri(domain),
           provider.getSigner()
         );
+       
       }
 
-      setDecryptedMessage(new TextDecoder().decode(decryptedMessage));
+      setDecryptedMessage(new TextDecoder().decode(decryptedMessagetemp));
+      if(decryptedMessage)
+        convertTextToCSV(decryptedMessage);
       setLoading(false);
       toast.success("Message Decrypted", {
         position: "top-center",
@@ -436,9 +446,9 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
       formData.append('model', modelFile);
       formData.append('requirements', requirementsFile);
       formData.append('data', new Blob([decryptedMessage], { type: 'text/plain' }));
-
+      console.log(formData)
       try {
-        const response = await fetch('http://localhost:3000/process-data', {
+        const response = await fetch('http://localhost:5001/upload-model', {
           method: 'POST',
           body: formData,
         });
@@ -653,9 +663,11 @@ const AssetDetailsPage: React.FC<AssetDetailsPageProps> = () => {
         />
       )}
      <form onSubmit={handleModelSubmit}>
+     <h2>Upload Code File</h2>
         <input type="file" onChange={onModelFileChange} accept=".py" />
+        <h2>Upload requirements File</h2>
         <input type="file" onChange={onRequirementsFileChange} accept=".txt" />
-        <button type="submit">Upload and Process Model</button>
+        <button  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Upload and Process Model</button>
       </form>
     </div>
   );

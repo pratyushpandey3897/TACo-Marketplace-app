@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,ChangeEvent } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Buffer } from 'buffer';
 import { saveDataItem } from '../Services/AddItem'; // Adjust the import path as necessary
@@ -27,17 +27,29 @@ export const Encrypt = ({
   sampleData,
   Condition,
 }: Props) => {
-  const [plaintext, setPlaintext] = useState("plaintext");
+  const [file, setFile] = useState<File | null>(null);
   const {currentAccount} = useContext(AccountContext);
   const navigate = useNavigate();
-  const onClickEncrypt = () => {
-    encrypt(plaintext);
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    setFile(file);
   };
 
+  const onClickEncrypt = () => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const text = e.target?.result as string;
+        encrypt(text); // Encrypt the file content read as text
+      };
+      reader.readAsText(file);
+    }
+  };
   const onClickPublish = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!encryptedMessage) {
       console.error("No encrypted message available for publishing.");
+      toast.error("No encrypted message available.");
       return;
     }
 
@@ -48,6 +60,7 @@ export const Encrypt = ({
 
     try {
       if (currentAccount === null || currentAccount === "") {
+        toast.error("Wallet not connected");
         return;
       }
       await saveDataItem({
@@ -119,28 +132,16 @@ export const Encrypt = ({
   return (
     <>
       <h1 className="font-light text-xl p-5 text-center">
-        Step 2 - Set conditions and Encrypt a message
+        Upload file
       </h1>
       <form className="flex flex-col space-y-4 mx-auto lg:w-3/4 bg-white p-5 rounded shadow-lg">
         <label className="flex flex-col">
-          <h2>Enter Plaintext</h2>
-          <input
-            type="text"
-            value={plaintext}
-            onChange={(e) => setPlaintext(e.currentTarget.value)}
-            className="border p-2 rounded"
-            placeholder="Enter your plaintext message here"
-          />
+          <h1>Encrypt and Publish Your Data</h1>
+          <input type="file" onChange={handleFileChange} accept=".csv" />
+          <button onClick={onClickEncrypt} disabled={!enabled}>Encrypt File</button>
+          {EncryptedMessageContent()}
         </label>
-        <button
-          type="button" // Change the type to "button"
-          onClick={onClickEncrypt}
-          disabled={!enabled}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Encrypt
-        </button>
-        {EncryptedMessageContent()}
+  
       </form>
     </>
   );
