@@ -82,17 +82,23 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Endpoint to upload and process model
-app.post('/upload-model', upload.fields([{ name: 'model', maxCount: 1 }, { name: 'requirements', maxCount: 1 }]), (req, res) => {
+app.post('/upload-model', upload.fields([
+  { name: 'model', maxCount: 1 },
+  { name: 'requirements', maxCount: 1 },
+  { name: 'data', maxCount: 1 }
+]), (req, res) => {
   const modelFile = req.files['model'][0];
   const requirementsFile = req.files['requirements'][0];
+  const dataFile = req.files['data'][0];
 
-  buildAndRunDockerContainer(modelFile, requirementsFile, res);
+  buildAndRunDockerContainer(modelFile, requirementsFile, dataFile, res);
 });
 
-function buildAndRunDockerContainer(modelFile, requirementsFile, res) {
+function buildAndRunDockerContainer(modelFile, requirementsFile, dataFile, res) {
   const dockerImageName = `usermodel-${Date.now()}`;
-  const modelFilePath = modelFile.path;
+  const modelFilename = path.basename(modelFile.path);  // Extract filename from full path
   const requirementsFilePath = requirementsFile.path;
+  const dataFilePath = dataFile.path;
 
   // Generate a Dockerfile
   const dockerfileContent = `
@@ -100,10 +106,10 @@ FROM python:3.8-slim
 WORKDIR /app
 COPY ${path.basename(requirementsFilePath)} /app/
 RUN pip install --no-cache-dir -r ${path.basename(requirementsFilePath)}
-COPY ${path.basename(modelFilePath)} /app/model.py
-CMD ["python", "model.py"]
+COPY ${modelFilename} /app/model.py  // Use extracted filename
+COPY ${path.basename(dataFilePath)} /app/data.csv
+CMD ["python", "model.py", "data.csv"]
   `;
-
   fs.writeFileSync('Dockerfile', dockerfileContent);
 
   // Build Docker image

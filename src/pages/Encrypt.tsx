@@ -33,16 +33,43 @@ export const Encrypt = ({
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     setFile(file);
+    if (file) {
+      console.log("File selected:", file.name);
+    } else {
+      console.error("No file selected");
+    }
   };
 
   const onClickEncrypt = () => {
     if (file) {
+      console.log("File is not null, proceeding with reading file.");
       const reader = new FileReader();
+
+      reader.onloadstart = () => {
+        console.log("File reading started");
+      };
+
       reader.onload = (e: ProgressEvent<FileReader>) => {
         const text = e.target?.result as string;
-        encrypt(text); // Encrypt the file content read as text
+        console.log("File content:", text); // Log file content
+        if (text) {
+          encrypt(text); // Encrypt the file content read as text
+        } else {
+          console.error("File content is empty or could not be read");
+        }
       };
+
+      reader.onloadend = () => {
+        console.log("File reading finished");
+      };
+
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+      };
+
       reader.readAsText(file);
+    } else {
+      console.error("No file selected");
     }
   };
   const onClickPublish = async (event: React.FormEvent) => {
@@ -138,7 +165,9 @@ export const Encrypt = ({
         <label className="flex flex-col">
           <h1>Encrypt and Publish Your Data</h1>
           <input type="file" onChange={handleFileChange} accept=".csv" />
-          <button onClick={onClickEncrypt} disabled={!enabled}>Encrypt File</button>
+          <button type="button" onClick={onClickEncrypt} disabled={!enabled}>
+            Encrypt File
+          </button>
           {EncryptedMessageContent()}
         </label>
   
