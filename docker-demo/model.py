@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 
 def predict(data):
     results = {"Number": [], "Prediction": []}
@@ -13,7 +14,6 @@ def predict(data):
 
 if __name__ == "__main__":
     # Sample data input
-    import sys
     input_data = pd.DataFrame({"Number": [int(arg) for arg in sys.argv[1:]]})
     predictions = predict(input_data)
     print(predictions)
